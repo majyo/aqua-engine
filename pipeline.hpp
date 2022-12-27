@@ -10,13 +10,26 @@
 #include <vector>
 
 namespace aqua {
-    struct PipelineConfigInfo {};
+    struct PipelineConfigInfo {
+        VkViewport viewport{};
+        VkRect2D scissor{};
+        VkPipelineViewportStateCreateInfo viewportInfo{};
+        VkPipelineInputAssemblyStateCreateInfo inputAssemblyStateCreateInfo{};
+        VkPipelineRasterizationStateCreateInfo rasterizationInfo{};
+        VkPipelineMultisampleStateCreateInfo multisampleInfo{};
+        VkPipelineColorBlendAttachmentState colorBlendAttachment{};
+        VkPipelineColorBlendStateCreateInfo colorBlendInfo{};
+        VkPipelineDepthStencilStateCreateInfo depthStencilInfo{};
+        VkPipelineLayout pipelineLayout = nullptr;
+        VkRenderPass renderPass = nullptr;
+        uint32_t subpass = 0;
+    };
 
     class Pipeline {
     public:
         Pipeline(AquaDevice& device, const std::string& vertShaderPath, const std::string& fragShaderPath,
                  const PipelineConfigInfo& configInfo);
-        ~Pipeline() {}
+        ~Pipeline();
         Pipeline( const Pipeline& pipeline) = delete;
         Pipeline& operator=(const Pipeline& pipeline) = delete;
 
