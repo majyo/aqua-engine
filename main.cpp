@@ -2,9 +2,10 @@
 // Created by lihw on 26/12/22.
 //
 
+#include "application.hpp"
+
 #include <cstdlib>
 #include <iostream>
-#include "application.hpp"
 
 int main() {
     aqua::Application app{};

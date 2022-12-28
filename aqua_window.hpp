@@ -18,6 +18,9 @@ namespace aqua {
 
         bool shouldClose() { return glfwWindowShouldClose(window); }
         void createWindowSurface(VkInstance instance, VkSurfaceKHR* surface);
+        [[nodiscard]] VkExtent2D getExtent() const {
+            return {static_cast<uint32_t>(width), static_cast<uint32_t>(height)};
+        }
     private:
         void initWindow();
     private:

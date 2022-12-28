@@ -25,6 +25,10 @@ namespace aqua {
         vkDestroyPipeline(device.device(), graphicsPipeline, nullptr);
     }
 
+    void Pipeline::bind(VkCommandBuffer commandBuffer) {
+        vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
+    }
+
     std::vector<char> Pipeline::readFile(const std::string &filePath) {
         std::ifstream file{filePath, std::ios::ate | std::ios::binary};
 
@@ -51,6 +55,9 @@ namespace aqua {
         // Create shader modules
         auto vertCode = readFile(vertShaderPath);
         auto fragCode = readFile(fragShaderPath);
+
+        std::cout << "vert size: " << vertCode.size() << std::endl;
+        std::cout << "frag size: " << fragCode.size() << std::endl;
 
         createShaderModule(vertCode, &vertShaderModule);
         createShaderModule(fragCode, &fragShaderModule);
@@ -80,6 +87,14 @@ namespace aqua {
         vertexInputStateCreateInfo.pVertexAttributeDescriptions = nullptr;
         vertexInputStateCreateInfo.pVertexBindingDescriptions = nullptr;
 
+        // Create viewport create info
+        VkPipelineViewportStateCreateInfo viewportStateCreateInfo{};
+        viewportStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+        viewportStateCreateInfo.viewportCount = 1;
+        viewportStateCreateInfo.pViewports = &configInfo.viewport;
+        viewportStateCreateInfo.scissorCount = 1;
+        viewportStateCreateInfo.pScissors = &configInfo.scissor;
+
         // Create pipeline create info
         VkGraphicsPipelineCreateInfo pipelineCreateInfo{};
         pipelineCreateInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
@@ -87,7 +102,7 @@ namespace aqua {
         pipelineCreateInfo.pStages = shaderStageCreateInfo;
         pipelineCreateInfo.pVertexInputState = &vertexInputStateCreateInfo;
         pipelineCreateInfo.pInputAssemblyState = &configInfo.inputAssemblyStateCreateInfo;
-        pipelineCreateInfo.pViewportState = &configInfo.viewportInfo;
+        pipelineCreateInfo.pViewportState = &viewportStateCreateInfo;
         pipelineCreateInfo.pRasterizationState = &configInfo.rasterizationInfo;
         pipelineCreateInfo.pMultisampleState = &configInfo.multisampleInfo;
         pipelineCreateInfo.pColorBlendState = &configInfo.colorBlendInfo;
@@ -122,6 +137,9 @@ namespace aqua {
     PipelineConfigInfo Pipeline::getDefaultPipelineConfigInfo(uint32_t width, uint32_t height) {
         PipelineConfigInfo configInfo{};
 
+//        std::cout << "Extent Width: " << width << std::endl;
+//        std::cout << "Extent Height: " << height << std::endl;
+
         configInfo.inputAssemblyStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
         configInfo.inputAssemblyStateCreateInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
         configInfo.inputAssemblyStateCreateInfo.primitiveRestartEnable = VK_FALSE;
@@ -135,12 +153,6 @@ namespace aqua {
 
         configInfo.scissor.offset = {0, 0};
         configInfo.scissor.extent = {width, height};
-
-        configInfo.viewportInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-        configInfo.viewportInfo.viewportCount = 1;
-        configInfo.viewportInfo.pViewports = &configInfo.viewport;
-        configInfo.viewportInfo.scissorCount = 1;
-        configInfo.viewportInfo.pScissors = &configInfo.scissor;
 
         configInfo.rasterizationInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
         configInfo.rasterizationInfo.depthClampEnable = VK_FALSE;
@@ -169,6 +181,8 @@ namespace aqua {
         configInfo.colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
         configInfo.colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
         configInfo.colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD;
+        configInfo.colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT |
+                VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
 
         configInfo.colorBlendInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
         configInfo.colorBlendInfo.logicOpEnable = VK_FALSE;

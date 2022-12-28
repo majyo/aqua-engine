@@ -13,7 +13,6 @@ namespace aqua {
     struct PipelineConfigInfo {
         VkViewport viewport{};
         VkRect2D scissor{};
-        VkPipelineViewportStateCreateInfo viewportInfo{};
         VkPipelineInputAssemblyStateCreateInfo inputAssemblyStateCreateInfo{};
         VkPipelineRasterizationStateCreateInfo rasterizationInfo{};
         VkPipelineMultisampleStateCreateInfo multisampleInfo{};
@@ -33,6 +32,7 @@ namespace aqua {
         Pipeline( const Pipeline& pipeline) = delete;
         Pipeline& operator=(const Pipeline& pipeline) = delete;
 
+        void bind(VkCommandBuffer commandBuffer);
         static PipelineConfigInfo getDefaultPipelineConfigInfo(uint32_t width, uint32_t height);
 
     private:
