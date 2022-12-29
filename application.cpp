@@ -8,6 +8,7 @@
 namespace aqua {
 
     Application::Application() {
+        loadModel();
         createPipelineLayout();
         createPipeline();
         createCommandBuffers();
@@ -24,6 +25,16 @@ namespace aqua {
         }
 
         vkDeviceWaitIdle(device.device());
+    }
+
+    void Application::loadModel() {
+        std::vector<Model::Vertex> vertices {
+                {{ 0.0f, -0.5f}},
+                {{ 0.5f,  0.5f}},
+                {{-0.5f,  0.5f}}
+        };
+
+        model = std::make_unique<Model>(device, vertices);
     }
 
     void Application::createPipelineLayout() {
@@ -86,7 +97,8 @@ namespace aqua {
 
             vkCmdBeginRenderPass(commandBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
             pipeline->bind(commandBuffers[i]);
-            vkCmdDraw(commandBuffers[i], 3, 1, 0, 0);
+            model->bind(commandBuffers[i]);
+            model->draw(commandBuffers[i]);
 
             vkCmdEndRenderPass(commandBuffers[i]);
 

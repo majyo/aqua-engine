@@ -8,6 +8,7 @@
 #include "pipeline.hpp"
 #include "device.hpp"
 #include "swap_chain.hpp"
+#include "model.hpp"
 
 #include <memory>
 #include <vector>
@@ -26,6 +27,7 @@ namespace aqua {
         void run();
 
     private:
+        void loadModel();
         void createPipelineLayout();
         void createPipeline();
         void createCommandBuffers();
@@ -38,5 +40,6 @@ namespace aqua {
         std::unique_ptr<Pipeline> pipeline;
         VkPipelineLayout pipelineLayout{};
         std::vector<VkCommandBuffer> commandBuffers;
+        std::unique_ptr<Model> model;
     };
 }

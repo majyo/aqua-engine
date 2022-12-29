@@ -80,12 +80,15 @@ namespace aqua {
         shaderStageCreateInfo[1].pSpecializationInfo = nullptr;
 
         // Create vertex input state create info
+        auto bindingDescriptions = Model::Vertex::getBindingDescriptions();
+        auto attributeDescriptions = Model::Vertex::getAttributeDescriptions();
+
         VkPipelineVertexInputStateCreateInfo vertexInputStateCreateInfo{};
         vertexInputStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-        vertexInputStateCreateInfo.vertexAttributeDescriptionCount = 0;
-        vertexInputStateCreateInfo.vertexBindingDescriptionCount = 0;
-        vertexInputStateCreateInfo.pVertexAttributeDescriptions = nullptr;
-        vertexInputStateCreateInfo.pVertexBindingDescriptions = nullptr;
+        vertexInputStateCreateInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+        vertexInputStateCreateInfo.vertexBindingDescriptionCount = static_cast<uint32_t>(bindingDescriptions.size());
+        vertexInputStateCreateInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
+        vertexInputStateCreateInfo.pVertexBindingDescriptions = bindingDescriptions.data();
 
         // Create viewport create info
         VkPipelineViewportStateCreateInfo viewportStateCreateInfo{};
