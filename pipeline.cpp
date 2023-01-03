@@ -91,12 +91,12 @@ namespace aqua {
         vertexInputStateCreateInfo.pVertexBindingDescriptions = bindingDescriptions.data();
 
         // Create viewport create info
-        VkPipelineViewportStateCreateInfo viewportStateCreateInfo{};
-        viewportStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-        viewportStateCreateInfo.viewportCount = 1;
-        viewportStateCreateInfo.pViewports = &configInfo.viewport;
-        viewportStateCreateInfo.scissorCount = 1;
-        viewportStateCreateInfo.pScissors = &configInfo.scissor;
+//        VkPipelineViewportStateCreateInfo viewportStateCreateInfo{};
+//        viewportStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+//        viewportStateCreateInfo.viewportCount = 1;
+//        viewportStateCreateInfo.pViewports = &configInfo.viewport;
+//        viewportStateCreateInfo.scissorCount = 1;
+//        viewportStateCreateInfo.pScissors = &configInfo.scissor;
 
         // Create pipeline create info
         VkGraphicsPipelineCreateInfo pipelineCreateInfo{};
@@ -105,12 +105,13 @@ namespace aqua {
         pipelineCreateInfo.pStages = shaderStageCreateInfo;
         pipelineCreateInfo.pVertexInputState = &vertexInputStateCreateInfo;
         pipelineCreateInfo.pInputAssemblyState = &configInfo.inputAssemblyStateCreateInfo;
-        pipelineCreateInfo.pViewportState = &viewportStateCreateInfo;
+//        pipelineCreateInfo.pViewportState = &viewportStateCreateInfo;
+        pipelineCreateInfo.pViewportState = &configInfo.viewportStateCreateInfo;
         pipelineCreateInfo.pRasterizationState = &configInfo.rasterizationInfo;
         pipelineCreateInfo.pMultisampleState = &configInfo.multisampleInfo;
         pipelineCreateInfo.pColorBlendState = &configInfo.colorBlendInfo;
         pipelineCreateInfo.pDepthStencilState = &configInfo.depthStencilInfo;
-        pipelineCreateInfo.pDynamicState = nullptr;
+        pipelineCreateInfo.pDynamicState = &configInfo.dynamicStateCreateInfo;
 
         pipelineCreateInfo.layout = configInfo.pipelineLayout;
         pipelineCreateInfo.renderPass = configInfo.renderPass;
@@ -137,9 +138,7 @@ namespace aqua {
         }
     }
 
-    PipelineConfigInfo Pipeline::getDefaultPipelineConfigInfo(uint32_t width, uint32_t height) {
-        PipelineConfigInfo configInfo{};
-
+    void Pipeline::setAsDefaultPipelineConfigInfo(PipelineConfigInfo& configInfo) {
 //        std::cout << "Extent Width: " << width << std::endl;
 //        std::cout << "Extent Height: " << height << std::endl;
 
@@ -147,15 +146,21 @@ namespace aqua {
         configInfo.inputAssemblyStateCreateInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
         configInfo.inputAssemblyStateCreateInfo.primitiveRestartEnable = VK_FALSE;
 
-        configInfo.viewport.x = 0.0f;
-        configInfo.viewport.y = 0.0f;
-        configInfo.viewport.width = static_cast<float>(width);
-        configInfo.viewport.height = static_cast<float>(height);
-        configInfo.viewport.minDepth = 0.0f;
-        configInfo.viewport.maxDepth = 1.0f;
+        configInfo.viewportStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+        configInfo.viewportStateCreateInfo.viewportCount = 1;
+        configInfo.viewportStateCreateInfo.pViewports = nullptr;
+        configInfo.viewportStateCreateInfo.scissorCount = 1;
+        configInfo.viewportStateCreateInfo.pScissors = nullptr;
 
-        configInfo.scissor.offset = {0, 0};
-        configInfo.scissor.extent = {width, height};
+//        configInfo.viewport.x = 0.0f;
+//        configInfo.viewport.y = 0.0f;
+//        configInfo.viewport.width = static_cast<float>(width);
+//        configInfo.viewport.height = static_cast<float>(height);
+//        configInfo.viewport.minDepth = 0.0f;
+//        configInfo.viewport.maxDepth = 1.0f;
+//
+//        configInfo.scissor.offset = {0, 0};
+//        configInfo.scissor.extent = {width, height};
 
         configInfo.rasterizationInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
         configInfo.rasterizationInfo.depthClampEnable = VK_FALSE;
@@ -208,6 +213,10 @@ namespace aqua {
         configInfo.depthStencilInfo.front = {};
         configInfo.depthStencilInfo.back = {};
 
-        return configInfo;
+        configInfo.dynamicStateEnables = {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
+        configInfo.dynamicStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+        configInfo.dynamicStateCreateInfo.pDynamicStates = configInfo.dynamicStateEnables.data();
+        configInfo.dynamicStateCreateInfo.dynamicStateCount = configInfo.dynamicStateEnables.size();
+        configInfo.dynamicStateCreateInfo.flags = 0;
     }
 }

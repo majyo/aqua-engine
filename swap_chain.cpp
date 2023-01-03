@@ -8,15 +8,27 @@
 #include <limits>
 #include <set>
 #include <stdexcept>
+#include <utility>
 
 namespace aqua {
     SwapChain::SwapChain(AquaDevice &deviceRef, VkExtent2D extent)
             : device{deviceRef}, windowExtent{extent} {
+        init();
+    }
+
+    SwapChain::SwapChain(AquaDevice &deviceRef, VkExtent2D windowExtent, std::shared_ptr<SwapChain> previousSwapChain)
+            : device(deviceRef), windowExtent(windowExtent), previousSwapChain(std::move(previousSwapChain)) {
+        init();
+
+        previousSwapChain = nullptr;
+    }
+
+    void SwapChain::init() {
         createSwapChain();
         createImageViews();
         createRenderPass();
         createDepthResources();
-        createFramebuffers();
+        createFrameBuffers();
         createSyncObjects();
     }
 
@@ -161,7 +173,7 @@ namespace aqua {
         createInfo.presentMode = presentMode;
         createInfo.clipped = VK_TRUE;
 
-        createInfo.oldSwapchain = VK_NULL_HANDLE;
+        createInfo.oldSwapchain = previousSwapChain == nullptr ? VK_NULL_HANDLE : previousSwapChain->swapChain;
 
         if (vkCreateSwapchainKHR(device.device(), &createInfo, nullptr, &swapChain) != VK_SUCCESS) {
             throw std::runtime_error("failed to create swap chain!");
@@ -261,7 +273,7 @@ namespace aqua {
         }
     }
 
-    void SwapChain::createFramebuffers() {
+    void SwapChain::createFrameBuffers() {
         swapChainFramebuffers.resize(imageCount());
         for (size_t i = 0; i < imageCount(); i++) {
             std::array<VkImageView, 2> attachments = {swapChainImageViews[i], depthImageViews[i]};
@@ -361,7 +373,7 @@ namespace aqua {
     VkSurfaceFormatKHR SwapChain::chooseSwapSurfaceFormat(
             const std::vector<VkSurfaceFormatKHR> &availableFormats) {
         for (const auto &availableFormat: availableFormats) {
-            if (availableFormat.format == VK_FORMAT_B8G8R8A8_UNORM &&
+            if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB &&
                 availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
                 return availableFormat;
             }
@@ -412,4 +424,5 @@ namespace aqua {
                 VK_IMAGE_TILING_OPTIMAL,
                 VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
     }
+
 }

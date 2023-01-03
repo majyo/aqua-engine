@@ -21,11 +21,19 @@ namespace aqua {
         [[nodiscard]] VkExtent2D getExtent() const {
             return {static_cast<uint32_t>(width), static_cast<uint32_t>(height)};
         }
+        [[nodiscard]] bool wasWindowResized() const {
+            return frameBufferResized;
+        }
+        void resetWindowResizedFlag() {
+            frameBufferResized = false;
+        }
     private:
         void initWindow();
+        static void frameBufferResizeCallback(GLFWwindow* window, int width, int height);
     private:
-        const int width;
-        const int height;
+        int width;
+        int height;
+        bool frameBufferResized = false;
         std::string windowName;
 
         GLFWwindow* window{};

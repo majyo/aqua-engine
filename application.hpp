@@ -30,13 +30,17 @@ namespace aqua {
         void loadModel();
         void createPipelineLayout();
         void createPipeline();
+        void recreateSwapChain();
         void createCommandBuffers();
         void drawFrame();
+        void recordCommandBuffer(uint32_t imageIndex);
+        void freeCommandBuffers();
 
     private:
         AquaWindow aquaWindow{WIDTH, HEIGHT, "Vulkan Demo"};
         AquaDevice device{aquaWindow};
-        SwapChain swapChain{device, aquaWindow.getExtent()};
+//        SwapChain swapChain{device, aquaWindow.getExtent()};
+        std::unique_ptr<SwapChain> swapChain;
         std::unique_ptr<Pipeline> pipeline;
         VkPipelineLayout pipelineLayout{};
         std::vector<VkCommandBuffer> commandBuffers;
