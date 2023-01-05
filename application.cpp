@@ -8,8 +8,10 @@
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
+#include <glm/gtc/constants.hpp>
 
 struct SimplePushConstantData {
+    glm::mat2 transform{1.0f};
     glm::vec2 offset;
     alignas(16) glm::vec3 color;
 };
@@ -17,9 +19,8 @@ struct SimplePushConstantData {
 namespace aqua {
 
     Application::Application() {
-        loadModel();
+        loadGameObject();
         createPipelineLayout();
-//        createPipeline();
         recreateSwapChain();
         createCommandBuffers();
     }
@@ -37,14 +38,21 @@ namespace aqua {
         vkDeviceWaitIdle(device.device());
     }
 
-    void Application::loadModel() {
+    void Application::loadGameObject() {
         std::vector<Model::Vertex> vertices {
                 {{ 0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
                 {{ 0.5f,  0.5f}, {0.0f, 1.0f, 0.0f}},
                 {{-0.5f,  0.5f}, {0.0f, 0.0f, 1.0f}}
         };
 
-        model = std::make_unique<Model>(device, vertices);
+        auto model = std::make_shared<Model>(device, vertices);
+        auto triangle = GameObject::createGameObject();
+        triangle.model = model;
+        triangle.color = {0.0f, 0.0f, 0.5f};
+        triangle.transform2D.translation.x = 0.2f;
+        triangle.transform2D.scale = {2.0f, 0.5f};
+        triangle.transform2D.rotation = 0.25f * glm::two_pi<float>();
+        gameObjects.push_back(std::move(triangle));
     }
 
     void Application::createPipelineLayout() {
@@ -115,10 +123,6 @@ namespace aqua {
         if (vkAllocateCommandBuffers(device.device(), &allocateInfo, commandBuffers.data()) != VK_SUCCESS) {
             throw std::runtime_error("Failed to allocate command buffers");
         }
-
-        for (int i = 0; i < commandBuffers.size(); ++i) {
-
-        }
     }
 
     void Application::recordCommandBuffer(uint32_t imageIndex) {
@@ -160,22 +164,7 @@ namespace aqua {
         vkCmdSetViewport(commandBuffers[imageIndex], 0, 1, &viewport);
         vkCmdSetScissor(commandBuffers[imageIndex], 0, 1, &scissor);
 
-        pipeline->bind(commandBuffers[imageIndex]);
-        model->bind(commandBuffers[imageIndex]);
-
-        for (int i = 0; i < 4; ++i) {
-            SimplePushConstantData pushConstantData{};
-            pushConstantData.offset = {0.0f, -0.4f + static_cast<float>(i) * 0.25f};
-            pushConstantData.color = {0.0f, 0.0f, 0.2f + static_cast<float>(i) * 0.2f};
-            vkCmdPushConstants(
-                    commandBuffers[imageIndex],
-                    pipelineLayout,
-                    VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
-                    0,
-                    sizeof(SimplePushConstantData),
-                    &pushConstantData);
-            model->draw(commandBuffers[imageIndex]);
-        }
+        renderGameObject(commandBuffers[imageIndex]);
 
         vkCmdEndRenderPass(commandBuffers[imageIndex]);
 
@@ -214,5 +203,26 @@ namespace aqua {
     void Application::freeCommandBuffers() {
         vkFreeCommandBuffers(device.device(), device.getCommandPool(), commandBuffers.size(), commandBuffers.data());
         commandBuffers.clear();
+    }
+
+    void Application::renderGameObject(VkCommandBuffer commandBuffer) {
+        pipeline->bind(commandBuffer);
+
+        for (auto& obj : gameObjects) {
+            SimplePushConstantData pushConstantData{};
+            pushConstantData.offset = obj.transform2D.translation;
+            pushConstantData.color = obj.color;
+            pushConstantData.transform = obj.transform2D.mat2();
+
+            vkCmdPushConstants(
+                    commandBuffer,
+                    pipelineLayout,
+                    VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+                    0,
+                    sizeof(SimplePushConstantData),
+                    &pushConstantData);
+            obj.model->bind(commandBuffer);
+            obj.model->draw(commandBuffer);
+        }
     }
 }

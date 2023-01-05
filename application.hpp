@@ -9,6 +9,7 @@
 #include "device.hpp"
 #include "swap_chain.hpp"
 #include "model.hpp"
+#include "game_object.hpp"
 
 #include <memory>
 #include <vector>
@@ -27,7 +28,7 @@ namespace aqua {
         void run();
 
     private:
-        void loadModel();
+        void loadGameObject();
         void createPipelineLayout();
         void createPipeline();
         void recreateSwapChain();
@@ -35,6 +36,7 @@ namespace aqua {
         void drawFrame();
         void recordCommandBuffer(uint32_t imageIndex);
         void freeCommandBuffers();
+        void renderGameObject(VkCommandBuffer commandBuffer);
 
     private:
         AquaWindow aquaWindow{WIDTH, HEIGHT, "Vulkan Demo"};
@@ -44,6 +46,6 @@ namespace aqua {
         std::unique_ptr<Pipeline> pipeline;
         VkPipelineLayout pipelineLayout{};
         std::vector<VkCommandBuffer> commandBuffers;
-        std::unique_ptr<Model> model;
+        std::vector<GameObject> gameObjects;
     };
 }
