@@ -41,7 +41,6 @@ namespace aqua {
     private:
         AquaWindow aquaWindow{WIDTH, HEIGHT, "Vulkan Demo"};
         AquaDevice device{aquaWindow};
-//        SwapChain swapChain{device, aquaWindow.getExtent()};
         std::unique_ptr<SwapChain> swapChain;
         std::unique_ptr<Pipeline> pipeline;
         VkPipelineLayout pipelineLayout{};
