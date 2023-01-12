@@ -7,8 +7,7 @@
 #include "aqua_window.hpp"
 #include "pipeline.hpp"
 #include "device.hpp"
-#include "swap_chain.hpp"
-#include "model.hpp"
+#include "renderer.hpp"
 #include "game_object.hpp"
 
 #include <memory>
@@ -31,20 +30,21 @@ namespace aqua {
         void loadGameObject();
         void createPipelineLayout();
         void createPipeline();
-        void recreateSwapChain();
-        void createCommandBuffers();
-        void drawFrame();
-        void recordCommandBuffer(uint32_t imageIndex);
-        void freeCommandBuffers();
+//        void recreateSwapChain();
+//        void createCommandBuffers();
+//        void drawFrame();
+//        void recordCommandBuffer(uint32_t imageIndex);
+//        void freeCommandBuffers();
         void renderGameObject(VkCommandBuffer commandBuffer);
 
     private:
         AquaWindow aquaWindow{WIDTH, HEIGHT, "Vulkan Demo"};
         AquaDevice device{aquaWindow};
-        std::unique_ptr<SwapChain> swapChain;
+        Renderer renderer{aquaWindow, device};
         std::unique_ptr<Pipeline> pipeline;
         VkPipelineLayout pipelineLayout{};
-        std::vector<VkCommandBuffer> commandBuffers;
+//        std::unique_ptr<SwapChain> swapChain;
+//        std::vector<VkCommandBuffer> commandBuffers;
         std::vector<GameObject> gameObjects;
     };
 }
