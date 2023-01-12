@@ -28,16 +28,11 @@ namespace aqua {
 
     private:
         void loadGameObject();
-//        void createPipelineLayout();
-//        void createPipeline();
-//        void renderGameObject(VkCommandBuffer commandBuffer);
 
     private:
         AquaWindow aquaWindow{WIDTH, HEIGHT, "Vulkan Demo"};
         AquaDevice device{aquaWindow};
         Renderer renderer{aquaWindow, device};
-//        std::unique_ptr<Pipeline> pipeline;
-//        VkPipelineLayout pipelineLayout{};
         std::vector<GameObject> gameObjects;
     };
 }

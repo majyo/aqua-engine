@@ -124,15 +124,18 @@ namespace aqua {
         if (swapChain == nullptr) {
             swapChain = std::make_unique<SwapChain>(device, extent);
         } else {
-            swapChain = std::make_unique<SwapChain>(device, extent, std::move(swapChain));
+            std::shared_ptr<SwapChain> oldSwapChain = std::move(swapChain);
+            swapChain = std::make_unique<SwapChain>(device, extent, oldSwapChain);
+
+            if (!oldSwapChain->compareSwapChainFormats(*swapChain)) {
+                throw std::runtime_error("Swap chain image format has been changed");
+            }
 
             if (swapChain->imageCount() != commandBuffers.size()) {
                 freeCommandBuffers();
                 createCommandBuffers();
             }
         }
-
-        // TODO: add create pipeline call
     }
 
     void Renderer::createCommandBuffers() {
