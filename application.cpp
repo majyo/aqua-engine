@@ -10,31 +10,29 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 
-struct SimplePushConstantData {
-    glm::mat4 transform{1.0f};
-    alignas(16) glm::vec3 color;
-};
-
 namespace aqua {
     std::unique_ptr<Model> createCubeModel(AquaDevice& device, glm::vec3 offset);
 
     Application::Application() {
         loadGameObject();
-        createPipelineLayout();
-        createPipeline();
+//        createPipelineLayout();
+//        createPipeline();
     }
 
     Application::~Application() {
-        vkDestroyPipelineLayout(device.device(), pipelineLayout, nullptr);
+//        vkDestroyPipelineLayout(device.device(), pipelineLayout, nullptr);
     }
 
     void Application::run() {
+        SimpleRenderSystem simpleRenderSystem{device, renderer.getSwapChainRenderPass()};
+
         while (!aquaWindow.shouldClose()) {
             glfwPollEvents();
 
             if (auto commandBuffer = renderer.beginFrame()) {
                 renderer.beginSwapChainRenderPass(commandBuffer);
-                renderGameObject(commandBuffer);
+//                renderGameObject(commandBuffer);
+                simpleRenderSystem.renderGameObjects(commandBuffer, gameObjects);
                 renderer.endSwapChainRenderPass(commandBuffer);
                 renderer.endFrame();
             }
@@ -53,60 +51,60 @@ namespace aqua {
         gameObjects.push_back(std::move(cube));
     }
 
-    void Application::createPipelineLayout() {
-        VkPushConstantRange pushConstantRange{};
-        pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
-        pushConstantRange.offset = 0;
-        pushConstantRange.size = sizeof(SimplePushConstantData);
-
-        VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo{};
-        pipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-        pipelineLayoutCreateInfo.setLayoutCount = 0;
-        pipelineLayoutCreateInfo.pSetLayouts = nullptr;
-        pipelineLayoutCreateInfo.pushConstantRangeCount = 1;
-        pipelineLayoutCreateInfo.pPushConstantRanges = &pushConstantRange;
-
-        if (vkCreatePipelineLayout(device.device(), &pipelineLayoutCreateInfo, nullptr, &pipelineLayout) !=VK_SUCCESS) {
-            throw std::runtime_error("Failed to create pipeline layout");
-        }
-    }
-
-    void Application::createPipeline() {
-        assert(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout.");
-
-        PipelineConfigInfo pipelineConfigInfo{};
-        Pipeline::setAsDefaultPipelineConfigInfo(pipelineConfigInfo);
-        pipelineConfigInfo.renderPass = renderer.getSwapChainRenderPass();
-        pipelineConfigInfo.pipelineLayout = pipelineLayout;
-        pipeline = std::make_unique<Pipeline>(
-                device,
-                "../shaders/simple_shader.vert.spv",
-                "../shaders/simple_shader.frag.spv",
-                pipelineConfigInfo);
-    }
-
-    void Application::renderGameObject(VkCommandBuffer commandBuffer) {
-        pipeline->bind(commandBuffer);
-
-        for (auto& obj : gameObjects) {
-            obj.transform.rotation.y = glm::mod(obj.transform.rotation.y + 0.01f, glm::two_pi<float>());
-            obj.transform.rotation.x = glm::mod(obj.transform.rotation.x + 0.01f, glm::two_pi<float>());
-
-            SimplePushConstantData pushConstantData{};
-            pushConstantData.transform = obj.transform.transform();
-            pushConstantData.color = obj.color;
-
-            vkCmdPushConstants(
-                    commandBuffer,
-                    pipelineLayout,
-                    VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
-                    0,
-                    sizeof(SimplePushConstantData),
-                    &pushConstantData);
-            obj.model->bind(commandBuffer);
-            obj.model->draw(commandBuffer);
-        }
-    }
+//    void Application::createPipelineLayout() {
+//        VkPushConstantRange pushConstantRange{};
+//        pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+//        pushConstantRange.offset = 0;
+//        pushConstantRange.size = sizeof(SimplePushConstantData);
+//
+//        VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo{};
+//        pipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+//        pipelineLayoutCreateInfo.setLayoutCount = 0;
+//        pipelineLayoutCreateInfo.pSetLayouts = nullptr;
+//        pipelineLayoutCreateInfo.pushConstantRangeCount = 1;
+//        pipelineLayoutCreateInfo.pPushConstantRanges = &pushConstantRange;
+//
+//        if (vkCreatePipelineLayout(device.device(), &pipelineLayoutCreateInfo, nullptr, &pipelineLayout) !=VK_SUCCESS) {
+//            throw std::runtime_error("Failed to create pipeline layout");
+//        }
+//    }
+//
+//    void Application::createPipeline() {
+//        assert(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout.");
+//
+//        PipelineConfigInfo pipelineConfigInfo{};
+//        Pipeline::setAsDefaultPipelineConfigInfo(pipelineConfigInfo);
+//        pipelineConfigInfo.renderPass = renderer.getSwapChainRenderPass();
+//        pipelineConfigInfo.pipelineLayout = pipelineLayout;
+//        pipeline = std::make_unique<Pipeline>(
+//                device,
+//                "../shaders/simple_shader.vert.spv",
+//                "../shaders/simple_shader.frag.spv",
+//                pipelineConfigInfo);
+//    }
+//
+//    void Application::renderGameObject(VkCommandBuffer commandBuffer) {
+//        pipeline->bind(commandBuffer);
+//
+//        for (auto& obj : gameObjects) {
+//            obj.transform.rotation.y = glm::mod(obj.transform.rotation.y + 0.01f, glm::two_pi<float>());
+//            obj.transform.rotation.x = glm::mod(obj.transform.rotation.x + 0.01f, glm::two_pi<float>());
+//
+//            SimplePushConstantData pushConstantData{};
+//            pushConstantData.transform = obj.transform.transform();
+//            pushConstantData.color = obj.color;
+//
+//            vkCmdPushConstants(
+//                    commandBuffer,
+//                    pipelineLayout,
+//                    VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+//                    0,
+//                    sizeof(SimplePushConstantData),
+//                    &pushConstantData);
+//            obj.model->bind(commandBuffer);
+//            obj.model->draw(commandBuffer);
+//        }
+//    }
 
     std::unique_ptr<Model> createCubeModel(AquaDevice& device, glm::vec3 offset) {
         std::vector<Model::Vertex> vertices{

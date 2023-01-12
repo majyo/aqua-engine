@@ -5,10 +5,10 @@
 #pragma once
 
 #include "aqua_window.hpp"
-#include "pipeline.hpp"
 #include "device.hpp"
 #include "renderer.hpp"
 #include "game_object.hpp"
+#include "simple_render_system.hpp"
 
 #include <memory>
 #include <vector>
@@ -28,23 +28,16 @@ namespace aqua {
 
     private:
         void loadGameObject();
-        void createPipelineLayout();
-        void createPipeline();
-//        void recreateSwapChain();
-//        void createCommandBuffers();
-//        void drawFrame();
-//        void recordCommandBuffer(uint32_t imageIndex);
-//        void freeCommandBuffers();
-        void renderGameObject(VkCommandBuffer commandBuffer);
+//        void createPipelineLayout();
+//        void createPipeline();
+//        void renderGameObject(VkCommandBuffer commandBuffer);
 
     private:
         AquaWindow aquaWindow{WIDTH, HEIGHT, "Vulkan Demo"};
         AquaDevice device{aquaWindow};
         Renderer renderer{aquaWindow, device};
-        std::unique_ptr<Pipeline> pipeline;
-        VkPipelineLayout pipelineLayout{};
-//        std::unique_ptr<SwapChain> swapChain;
-//        std::vector<VkCommandBuffer> commandBuffers;
+//        std::unique_ptr<Pipeline> pipeline;
+//        VkPipelineLayout pipelineLayout{};
         std::vector<GameObject> gameObjects;
     };
 }
