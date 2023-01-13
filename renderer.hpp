@@ -32,17 +32,25 @@ namespace aqua {
 
         [[nodiscard]] VkCommandBuffer getCurrentCommandBuffer() const {
             assert(isFrameStarted && "Cannot get command buffer when frame not in progress");
-            return commandBuffers[currentImageIndex];
+            return commandBuffers[currentFrameIndex];
         }
 
         [[nodiscard]] VkRenderPass getSwapChainRenderPass() const {
             return swapChain->getRenderPass();
         }
 
+        [[nodiscard]] int getFrameIndex() const {
+            assert(isFrameStarted && "Cannot get frame index when frame not in progress");
+            return currentFrameIndex;
+        }
+
+        [[nodiscard]] float getAspectRatio() const {
+            return swapChain->extentAspectRatio();
+        }
+
     private:
         void recreateSwapChain();
         void createCommandBuffers();
-        void drawFrame();
         void freeCommandBuffers();
 
     private:
@@ -50,6 +58,7 @@ namespace aqua {
         AquaDevice& device;
         std::unique_ptr<SwapChain> swapChain;
         std::vector<VkCommandBuffer> commandBuffers;
+        int currentFrameIndex{0};
         uint32_t currentImageIndex{};
         bool isFrameStarted{false};
     };

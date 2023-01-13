@@ -17,8 +17,6 @@ struct SimplePushConstantData {
 };
 
 namespace aqua {
-//    std::unique_ptr<Model> createCubeModel(AquaDevice &device, glm::vec3 offset);
-
     SimpleRenderSystem::SimpleRenderSystem(aqua::AquaDevice &device, VkRenderPass renderPass) : device(device) {
         createPipelineLayout();
         createPipeline(renderPass);
@@ -61,15 +59,18 @@ namespace aqua {
                 pipelineConfigInfo);
     }
 
-    void SimpleRenderSystem::renderGameObjects(VkCommandBuffer commandBuffer, std::vector<GameObject> &gameObjects) {
+    void SimpleRenderSystem::renderGameObjects(VkCommandBuffer commandBuffer, std::vector<GameObject> &gameObjects,
+                                               const Camera& camera) {
         pipeline->bind(commandBuffer);
+
+        auto projectionView = camera.getProjection() * camera.getView();
 
         for (auto &obj: gameObjects) {
             obj.transform.rotation.y = glm::mod(obj.transform.rotation.y + 0.01f, glm::two_pi<float>());
             obj.transform.rotation.x = glm::mod(obj.transform.rotation.x + 0.01f, glm::two_pi<float>());
 
             SimplePushConstantData pushConstantData{};
-            pushConstantData.transform = obj.transform.transform();
+            pushConstantData.transform = projectionView * obj.transform.transform();
             pushConstantData.color = obj.color;
 
             vkCmdPushConstants(
@@ -83,62 +84,4 @@ namespace aqua {
             obj.model->draw(commandBuffer);
         }
     }
-
-//    std::unique_ptr<Model> createCubeModel(AquaDevice &device, glm::vec3 offset) {
-//        std::vector<Model::Vertex> vertices{
-//                // left face (white)
-//                {{-.5f, -.5f, -.5f},  {.9f, .9f, .9f}},
-//                {{-.5f, .5f,  .5f},   {.9f, .9f, .9f}},
-//                {{-.5f, -.5f, .5f},   {.9f, .9f, .9f}},
-//                {{-.5f, -.5f, -.5f},  {.9f, .9f, .9f}},
-//                {{-.5f, .5f,  -.5f},  {.9f, .9f, .9f}},
-//                {{-.5f, .5f,  .5f},   {.9f, .9f, .9f}},
-//
-//                // right face (yellow)
-//                {{.5f,  -.5f, -.5f},  {.8f, .8f, .1f}},
-//                {{.5f,  .5f,  .5f},   {.8f, .8f, .1f}},
-//                {{.5f,  -.5f, .5f},   {.8f, .8f, .1f}},
-//                {{.5f,  -.5f, -.5f},  {.8f, .8f, .1f}},
-//                {{.5f,  .5f,  -.5f},  {.8f, .8f, .1f}},
-//                {{.5f,  .5f,  .5f},   {.8f, .8f, .1f}},
-//
-//                // top face (orange, remember y-axis points down)
-//                {{-.5f, -.5f, -.5f},  {.9f, .6f, .1f}},
-//                {{.5f,  -.5f, .5f},   {.9f, .6f, .1f}},
-//                {{-.5f, -.5f, .5f},   {.9f, .6f, .1f}},
-//                {{-.5f, -.5f, -.5f},  {.9f, .6f, .1f}},
-//                {{.5f,  -.5f, -.5f},  {.9f, .6f, .1f}},
-//                {{.5f,  -.5f, .5f},   {.9f, .6f, .1f}},
-//
-//                // bottom face (red)
-//                {{-.5f, .5f,  -.5f},  {.8f, .1f, .1f}},
-//                {{.5f,  .5f,  .5f},   {.8f, .1f, .1f}},
-//                {{-.5f, .5f,  .5f},   {.8f, .1f, .1f}},
-//                {{-.5f, .5f,  -.5f},  {.8f, .1f, .1f}},
-//                {{.5f,  .5f,  -.5f},  {.8f, .1f, .1f}},
-//                {{.5f,  .5f,  .5f},   {.8f, .1f, .1f}},
-//
-//                // nose face (blue)
-//                {{-.5f, -.5f, 0.5f},  {.1f, .1f, .8f}},
-//                {{.5f,  .5f,  0.5f},  {.1f, .1f, .8f}},
-//                {{-.5f, .5f,  0.5f},  {.1f, .1f, .8f}},
-//                {{-.5f, -.5f, 0.5f},  {.1f, .1f, .8f}},
-//                {{.5f,  -.5f, 0.5f},  {.1f, .1f, .8f}},
-//                {{.5f,  .5f,  0.5f},  {.1f, .1f, .8f}},
-//
-//                // tail face (green)
-//                {{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
-//                {{.5f,  .5f,  -0.5f}, {.1f, .8f, .1f}},
-//                {{-.5f, .5f,  -0.5f}, {.1f, .8f, .1f}},
-//                {{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
-//                {{.5f,  -.5f, -0.5f}, {.1f, .8f, .1f}},
-//                {{.5f,  .5f,  -0.5f}, {.1f, .8f, .1f}},
-//        };
-//
-//        for (auto &v: vertices) {
-//            v.position += offset;
-//        }
-//
-//        return std::make_unique<Model>(device, vertices);
-//    }
 }

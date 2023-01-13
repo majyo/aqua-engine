@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "camera.hpp"
 #include "aqua_window.hpp"
 #include "device.hpp"
 #include "renderer.hpp"
@@ -12,6 +13,7 @@
 
 #include <memory>
 #include <vector>
+#include <chrono>
 
 namespace aqua {
     class Application {

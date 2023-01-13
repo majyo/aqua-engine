@@ -22,13 +22,22 @@ namespace aqua {
 
     void Application::run() {
         SimpleRenderSystem simpleRenderSystem{device, renderer.getSwapChainRenderPass()};
+        Camera camera{};
+        camera.setViewDirection(glm::vec3(0.0f), glm::vec3(0.25f, 0.0f, 1.0f));
+
+        auto currentTime = std::chrono::high_resolution_clock::now();
 
         while (!aquaWindow.shouldClose()) {
             glfwPollEvents();
 
+            auto newTime = std::chrono::high_resolution_clock::now();
+
+            float aspectRatio = renderer.getAspectRatio();
+            camera.setPerspectiveProjection(glm::radians(50.0f), aspectRatio, 0.1f, 10.0f);
+
             if (auto commandBuffer = renderer.beginFrame()) {
                 renderer.beginSwapChainRenderPass(commandBuffer);
-                simpleRenderSystem.renderGameObjects(commandBuffer, gameObjects);
+                simpleRenderSystem.renderGameObjects(commandBuffer, gameObjects, camera);
                 renderer.endSwapChainRenderPass(commandBuffer);
                 renderer.endFrame();
             }
@@ -42,7 +51,7 @@ namespace aqua {
         auto cube = GameObject::createGameObject();
         cube.model = model;
         cube.color = {0.0f, 0.25f, 0.25f};
-        cube.transform.translation.z = 0.5f;
+        cube.transform.translation.z = 2.5f;
         cube.transform.scale = {0.5f, 0.5f, 0.5f};
         gameObjects.push_back(std::move(cube));
     }

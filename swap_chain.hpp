@@ -20,7 +20,7 @@ namespace aqua {
         SwapChain(AquaDevice &deviceRef, VkExtent2D windowExtent, std::shared_ptr<SwapChain> previousSwapChain);
         ~SwapChain();
         SwapChain(const SwapChain &) = delete;
-        void operator=(const SwapChain &) = delete;
+        SwapChain& operator=(const SwapChain &) = delete;
         VkFramebuffer getFrameBuffer(int index) { return swapChainFramebuffers[index]; }
         VkRenderPass getRenderPass() { return renderPass; }
         VkImageView getImageView(int index) { return swapChainImageViews[index]; }

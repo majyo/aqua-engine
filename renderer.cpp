@@ -64,6 +64,7 @@ namespace aqua {
         }
 
         isFrameStarted = false;
+        currentFrameIndex = (currentFrameIndex + 1) % SwapChain::MAX_FRAMES_IN_FLIGHT;
     }
 
     void Renderer::beginSwapChainRenderPass(VkCommandBuffer commandBuffer) {
@@ -130,16 +131,11 @@ namespace aqua {
             if (!oldSwapChain->compareSwapChainFormats(*swapChain)) {
                 throw std::runtime_error("Swap chain image format has been changed");
             }
-
-            if (swapChain->imageCount() != commandBuffers.size()) {
-                freeCommandBuffers();
-                createCommandBuffers();
-            }
         }
     }
 
     void Renderer::createCommandBuffers() {
-        commandBuffers.resize(swapChain->imageCount());
+        commandBuffers.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
         VkCommandBufferAllocateInfo allocateInfo{};
         allocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
         allocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
