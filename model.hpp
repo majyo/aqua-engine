@@ -21,6 +21,11 @@ namespace aqua {
             static std::vector<VkVertexInputAttributeDescription> getAttributeDescriptions();
         };
 
+        struct Builder {
+            std::vector<Vertex> vertices{};
+            std::vector<uint32_t> indices{};
+        };
+
         Model(AquaDevice& device, const std::vector<Vertex>& vertices);
         ~Model();
         Model(const Model& model) = delete;

@@ -3,12 +3,15 @@
 //
 
 #include "application.hpp"
-#include <array>
+
+#include "keyboard_movement.hpp"
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
+
+#include <array>
 
 namespace aqua {
     std::unique_ptr<Model> createCubeModel(AquaDevice& device, glm::vec3 offset);
@@ -25,12 +28,20 @@ namespace aqua {
         Camera camera{};
         camera.setViewDirection(glm::vec3(0.0f), glm::vec3(0.25f, 0.0f, 1.0f));
 
+        auto viewer = GameObject::createGameObject();
+        KeyboardMovementController cameraController{};
+
         auto currentTime = std::chrono::high_resolution_clock::now();
 
         while (!aquaWindow.shouldClose()) {
             glfwPollEvents();
 
             auto newTime = std::chrono::high_resolution_clock::now();
+            auto frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
+            currentTime = newTime;
+
+            cameraController.moveInPlaneXZ(aquaWindow.getGLFWWindow(), frameTime, viewer);
+            camera.setViewYXZ(viewer.transform.translation, viewer.transform.rotation);
 
             float aspectRatio = renderer.getAspectRatio();
             camera.setPerspectiveProjection(glm::radians(50.0f), aspectRatio, 0.1f, 10.0f);
