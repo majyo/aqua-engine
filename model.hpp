@@ -26,7 +26,7 @@ namespace aqua {
             std::vector<uint32_t> indices{};
         };
 
-        Model(AquaDevice& device, const std::vector<Vertex>& vertices);
+        Model(AquaDevice& device, const Builder& builder);
         ~Model();
         Model(const Model& model) = delete;
         Model& operator=(const Model& model) = delete;
@@ -35,10 +35,17 @@ namespace aqua {
         void draw(VkCommandBuffer commandBuffer) const;
     private:
         void createVertexBuffers(const std::vector<Vertex> &vertices);
+        void createIndexBuffers(const std::vector<uint32_t>& indices);
     private:
         AquaDevice& device;
+
         VkBuffer vertexBuffer{};
         VkDeviceMemory vertexBufferMemory{};
         uint32_t vertexCount{};
+
+        bool hasIndexBuffer{false};
+        VkBuffer indexBuffer{};
+        VkDeviceMemory indexBufferMemory{};
+        uint32_t indexCount{};
     };
 }
