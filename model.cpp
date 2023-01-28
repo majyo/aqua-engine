@@ -4,8 +4,27 @@
 
 #include "model.hpp"
 
+#include "utils.hpp"
+
+#define TINYOBJLOADER_IMPLEMENTATION
+#include "vendors/tiny_obj_loader.h"
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/hash.hpp>
+
 #include <cassert>
 #include <cstring>
+#include <iostream>
+
+namespace std {
+    template<>
+    struct hash<aqua::Model::Vertex> {
+        ::size_t operator()(const aqua::Model::Vertex& vertex) const {
+            ::size_t seed = 0;
+            aqua::hashCombine(seed, vertex.position, vertex.color, vertex.normal, vertex.uv);
+            return seed;
+        }
+    };
+}
 
 namespace aqua {
     Model::Model(AquaDevice &device, const Builder& builder) : device(device) {
@@ -43,21 +62,44 @@ namespace aqua {
         vkCmdDraw(commandBuffer, vertexCount, 1, 0, 0);
     }
 
+    std::unique_ptr<Model> Model::createModelFromFile(AquaDevice &device, const std::string& filePath) {
+        Builder builder{};
+        builder.loadModel(filePath);
+        std::cout << "Vertex count: " << builder.vertices.size() << std::endl;
+        return std::make_unique<Model>(device, builder);
+    }
+
     void Model::createVertexBuffers(const std::vector<Vertex> &vertices) {
         vertexCount = static_cast<uint32_t>(vertices.size());
         assert(vertexCount >= 3 && "Vertex count must be at least 3");
         VkDeviceSize bufferSize = sizeof(vertices[0]) * vertexCount;
+
+        VkBuffer stagingBuffer;
+        VkDeviceMemory stagingBufferMemory;
+
         device.createBuffer(
                 bufferSize,
-                VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+                VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                stagingBuffer,
+                stagingBufferMemory);
+
+        void* data;
+        vkMapMemory(device.device(), stagingBufferMemory, 0, bufferSize, 0, &data);
+        memcpy(data, vertices.data(), static_cast<size_t>(bufferSize));
+        vkUnmapMemory(device.device(), stagingBufferMemory);
+
+        device.createBuffer(
+                bufferSize,
+                VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+                VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
                 vertexBuffer,
                 vertexBufferMemory);
 
-        void* data;
-        vkMapMemory(device.device(), vertexBufferMemory, 0, bufferSize, 0, &data);
-        memcpy(data, vertices.data(), static_cast<size_t>(bufferSize));
-        vkUnmapMemory(device.device(), vertexBufferMemory);
+        device.copyBuffer(stagingBuffer, vertexBuffer, bufferSize);
+
+        vkDestroyBuffer(device.device(), stagingBuffer, nullptr);
+        vkFreeMemory(device.device(), stagingBufferMemory, nullptr);
     }
 
     void Model::createIndexBuffers(const std::vector<uint32_t> &indices) {
@@ -69,17 +111,33 @@ namespace aqua {
         }
 
         VkDeviceSize bufferSize = sizeof(indices[0]) * indexCount;
+
+        VkBuffer stagingBuffer;
+        VkDeviceMemory stagingBufferMemory;
+
         device.createBuffer(
                 bufferSize,
-                VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+                VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                stagingBuffer,
+                stagingBufferMemory);
+
+        void* data;
+        vkMapMemory(device.device(), stagingBufferMemory, 0, bufferSize, 0, &data);
+        memcpy(data, indices.data(), static_cast<size_t>(bufferSize));
+        vkUnmapMemory(device.device(), stagingBufferMemory);
+
+        device.createBuffer(
+                bufferSize,
+                VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+                VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
                 indexBuffer,
                 indexBufferMemory);
 
-        void* data;
-        vkMapMemory(device.device(), indexBufferMemory, 0, bufferSize, 0, &data);
-        memcpy(data, indices.data(), static_cast<size_t>(bufferSize));
-        vkUnmapMemory(device.device(), indexBufferMemory);
+        device.copyBuffer(stagingBuffer, indexBuffer, bufferSize);
+
+        vkDestroyBuffer(device.device(), stagingBuffer, nullptr);
+        vkFreeMemory(device.device(), stagingBufferMemory, nullptr);
     }
 
     std::vector<VkVertexInputBindingDescription> Model::Vertex::getBindingDescriptions() {
@@ -103,5 +161,69 @@ namespace aqua {
         attributeDescriptions[1].offset = offsetof(Vertex, color);
 
         return attributeDescriptions;
+    }
+
+    void Model::Builder::loadModel(const std::string &filename) {
+        tinyobj::attrib_t attrib;
+        std::vector<tinyobj::shape_t> shapes;
+        std::vector<tinyobj::material_t> materials;
+        std::string warning, error;
+
+        if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warning, &error, filename.c_str())) {
+            throw std::runtime_error(warning + error);
+        }
+
+        vertices.clear();
+        indices.clear();
+
+        std::unordered_map<Vertex, uint32_t> uniqueVertices{};
+
+        for (const auto& shape : shapes) {
+            for (const auto& index : shape.mesh.indices) {
+                Vertex vertex{};
+
+                if (index.vertex_index >= 0) {
+                    vertex.position = {
+                            attrib.vertices[3 * index.vertex_index + 0],
+                            attrib.vertices[3 * index.vertex_index + 1],
+                            attrib.vertices[3 * index.vertex_index + 2],
+                    };
+
+                    auto colorIndex = 3 * index.vertex_index + 2;
+
+                    if (colorIndex < attrib.colors.size()) {
+                        vertex.color = {
+                                attrib.colors[colorIndex - 2],
+                                attrib.colors[colorIndex - 1],
+                                attrib.colors[colorIndex - 0],
+                        };
+                    } else {
+                        vertex.color = {1.0f, 1.0f, 1.0f};
+                    }
+                }
+
+                if (index.normal_index >= 0) {
+                    vertex.normal = {
+                            attrib.normals[3 * index.vertex_index + 0],
+                            attrib.normals[3 * index.vertex_index + 1],
+                            attrib.normals[3 * index.vertex_index + 2],
+                    };
+                }
+
+                if (index.texcoord_index >= 0) {
+                    vertex.uv = {
+                            attrib.texcoords[2 * index.vertex_index + 0],
+                            attrib.texcoords[2 * index.vertex_index + 1],
+                    };
+                }
+
+                if (uniqueVertices.count(vertex) == 0) {
+                    uniqueVertices[vertex] = static_cast<uint32_t>(vertices.size());
+                    vertices.push_back(vertex);
+                }
+
+                indices.push_back(uniqueVertices[vertex]);
+            }
+        }
     }
 }
