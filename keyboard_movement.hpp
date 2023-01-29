@@ -23,11 +23,21 @@ namespace aqua {
             int lookDown = GLFW_KEY_DOWN;
         };
 
+        struct SurroundingOrbit {
+            glm::vec3 focus;
+            float radius;
+            float theta;
+            float phi;
+        };
+
         void moveInPlaneXZ(GLFWwindow* window, float dt, GameObject& gameObject);
+        void moveEncircle(GLFWwindow* window, SurroundingOrbit& orbit, GameObject& gameObject);
 
     public:
         KeyMappings keyMappings{};
         float moveSpeed{3.0f};
-        float lookSpeed{1.5f};
+        float lookSpeed{1.0f};
+        double mouseX{0.0};
+        double mouseY{0.0};
     };
 }

@@ -5,6 +5,7 @@
 #include "keyboard_movement.hpp"
 
 #include <cmath>
+#include <iostream>
 
 void aqua::KeyboardMovementController::moveInPlaneXZ(GLFWwindow *window, float dt, aqua::GameObject &gameObject) {
     glm::vec3 rotation{0.0f};
@@ -38,4 +39,27 @@ void aqua::KeyboardMovementController::moveInPlaneXZ(GLFWwindow *window, float d
     if (glm::dot(moveDirection, moveDirection) > std::numeric_limits<float>::epsilon()) {
         gameObject.transform.translation += moveSpeed * dt * moveDirection;
     }
+}
+
+void aqua::KeyboardMovementController::moveEncircle(GLFWwindow *window, SurroundingOrbit& orbit,
+                                                    aqua::GameObject &gameObject) {
+    auto prevMouseX = mouseX;
+    auto prevMouseY = mouseY;
+
+    glfwGetCursorPos(window, &mouseX, &mouseY);
+    auto deltaMouseX = mouseX - prevMouseX;
+    auto deltaMouseY = mouseY - prevMouseY;
+
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+        orbit.phi += static_cast<float>(deltaMouseX) * 0.004f;
+        orbit.theta += static_cast<float>(deltaMouseY) * 0.004f;
+    }
+
+    glm::vec3 direction{glm::sin(orbit.theta) * glm::sin(orbit.phi),
+                        glm::cos(orbit.theta),
+                        glm::sin(orbit.theta) * glm::cos(orbit.phi)};
+    glm::vec3 position = orbit.focus + direction * orbit.radius;
+
+    gameObject.transform.translation = position;
+    gameObject.transform.rotation = direction;
 }
