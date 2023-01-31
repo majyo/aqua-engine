@@ -51,9 +51,13 @@ void aqua::KeyboardMovementController::moveEncircle(GLFWwindow *window, Surround
     auto deltaMouseY = mouseY - prevMouseY;
 
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-        orbit.phi += static_cast<float>(deltaMouseX) * 0.004f;
-        orbit.theta += static_cast<float>(deltaMouseY) * 0.004f;
+        orbit.phi += static_cast<float>(-deltaMouseX) * 0.004f;
+        orbit.theta += static_cast<float>(-deltaMouseY) * 0.004f;
     }
+
+    orbit.theta = glm::clamp(orbit.theta, 0.2f, 2.8f);
+    orbit.phi = glm::mod(orbit.phi, glm::two_pi<float>());
+
 
     glm::vec3 direction{glm::sin(orbit.theta) * glm::sin(orbit.phi),
                         glm::cos(orbit.theta),

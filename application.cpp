@@ -25,14 +25,14 @@ namespace aqua {
     void Application::run() {
         SimpleRenderSystem simpleRenderSystem{device, renderer.getSwapChainRenderPass()};
         Camera camera{};
-        camera.setViewDirection(glm::vec3(0.0f, 0.0f, 2.5f), glm::vec3(0.0f, 0.0f, -1.0f));
+        camera.setViewDirection(glm::vec3(0.0f, 0.0f, 10.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
         auto viewer = GameObject::createGameObject();
         KeyboardMovementController cameraController{};
 
         auto currentTime = std::chrono::high_resolution_clock::now();
 
-        KeyboardMovementController::SurroundingOrbit orbit{{0.0f, 0.0f, 0.0f}, 2.0f, glm::half_pi<float>(), 0.0f};
+        KeyboardMovementController::SurroundingOrbit orbit{{0.0f, 0.0f, 0.0f}, 10.0f, glm::half_pi<float>(), 0.0f};
 
         while (!aquaWindow.shouldClose()) {
             glfwPollEvents();
@@ -44,10 +44,10 @@ namespace aqua {
 //            cameraController.moveInPlaneXZ(aquaWindow.getGLFWWindow(), frameTime, viewer);
 //            camera.setViewYXZ(viewer.transform.translation, viewer.transform.rotation);
             cameraController.moveEncircle(aquaWindow.getGLFWWindow(), orbit, viewer);
-            camera.setViewDirection(viewer.transform.translation, -viewer.transform.rotation);
+            camera.setViewDirection(viewer.transform.translation, -viewer.transform.rotation, glm::vec3(0.0f, 1.0f, 0.0f));
 
             float aspectRatio = renderer.getAspectRatio();
-            camera.setPerspectiveProjection(glm::radians(50.0f), aspectRatio, 0.1f, 10.0f);
+            camera.setPerspectiveProjection(glm::radians(50.0f), aspectRatio, 0.1f, 100.0f);
 
             if (auto commandBuffer = renderer.beginFrame()) {
                 renderer.beginSwapChainRenderPass(commandBuffer);
@@ -64,8 +64,9 @@ namespace aqua {
         std::shared_ptr<Model> model = Model::createModelFromFile(device, "../models/smooth_vase.obj");
         auto gameObject = GameObject::createGameObject();
         gameObject.model = model;
-        gameObject.transform.translation.z = 0.0f;
-        gameObject.transform.scale = {1.0f, 1.0f, 1.0f};
+//        gameObject.transform.scale = {1.0f, 1.0f, 1.0f};
+        gameObject.transform.scale = {5.0f, 5.0f, 5.0f};
+        gameObject.transform.rotation = {0.0f, 0.0f, glm::pi<float>()};
         gameObjects.push_back(std::move(gameObject));
     }
 }

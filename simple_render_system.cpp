@@ -13,7 +13,7 @@
 
 struct SimplePushConstantData {
     glm::mat4 transform{1.0f};
-    alignas(16) glm::vec3 color;
+    glm::mat4 model{1.0f};
 };
 
 namespace aqua {
@@ -70,8 +70,9 @@ namespace aqua {
 //            obj.transform.rotation.x = glm::mod(obj.transform.rotation.x + 0.01f, glm::two_pi<float>());
 
             SimplePushConstantData pushConstantData{};
-            pushConstantData.transform = projectionView * obj.transform.transform();
-            pushConstantData.color = obj.color;
+            auto modelMatrix = obj.transform.transform();
+            pushConstantData.transform = projectionView * modelMatrix;
+            pushConstantData.model = modelMatrix;
 
             vkCmdPushConstants(
                     commandBuffer,
