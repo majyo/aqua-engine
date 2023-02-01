@@ -42,7 +42,7 @@ namespace aqua {
             currentTime = newTime;
 
 //            cameraController.moveInPlaneXZ(aquaWindow.getGLFWWindow(), frameTime, viewer);
-//            camera.setViewYXZ(viewer.transform.translation, viewer.transform.rotation);
+//            camera.setViewYXZ(viewer.transform.translation, viewer.mat.rotation);
             cameraController.moveEncircle(aquaWindow.getGLFWWindow(), orbit, viewer);
             camera.setViewDirection(viewer.transform.translation, -viewer.transform.rotation, glm::vec3(0.0f, 1.0f, 0.0f));
 
@@ -64,7 +64,7 @@ namespace aqua {
         std::shared_ptr<Model> model = Model::createModelFromFile(device, "../models/smooth_vase.obj");
         auto gameObject = GameObject::createGameObject();
         gameObject.model = model;
-//        gameObject.transform.scale = {1.0f, 1.0f, 1.0f};
+//        gameObject.mat.scale = {1.0f, 1.0f, 1.0f};
         gameObject.transform.scale = {5.0f, 5.0f, 5.0f};
         gameObject.transform.rotation = {0.0f, 0.0f, glm::pi<float>()};
         gameObjects.push_back(std::move(gameObject));

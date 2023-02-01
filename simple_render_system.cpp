@@ -13,7 +13,7 @@
 
 struct SimplePushConstantData {
     glm::mat4 transform{1.0f};
-    glm::mat4 model{1.0f};
+    glm::mat4 normalMatrix{1.0f};
 };
 
 namespace aqua {
@@ -66,13 +66,12 @@ namespace aqua {
         auto projectionView = camera.getProjection() * camera.getView();
 
         for (auto &obj: gameObjects) {
-//            obj.transform.rotation.y = glm::mod(obj.transform.rotation.y + 0.01f, glm::two_pi<float>());
-//            obj.transform.rotation.x = glm::mod(obj.transform.rotation.x + 0.01f, glm::two_pi<float>());
+//            obj.transform.rotation.y = glm::mod(obj.mat.rotation.y + 0.01f, glm::two_pi<float>());
+//            obj.transform.rotation.x = glm::mod(obj.mat.rotation.x + 0.01f, glm::two_pi<float>());
 
             SimplePushConstantData pushConstantData{};
-            auto modelMatrix = obj.transform.transform();
-            pushConstantData.transform = projectionView * modelMatrix;
-            pushConstantData.model = modelMatrix;
+            pushConstantData.transform = projectionView * obj.transform.mat();
+            pushConstantData.normalMatrix = obj.transform.normalMat();
 
             vkCmdPushConstants(
                     commandBuffer,

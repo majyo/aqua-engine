@@ -12,11 +12,11 @@ layout (location = 0) out Varying {
 
 layout (push_constant) uniform Push {
     mat4 transform;
-    mat4 model;
+    mat4 normalMatrix;
 } push;
 
 void main() {
-    vary.normalWS = normalize(mat3(push.model) * normal);
+    vary.normalWS = mat3(push.normalMatrix) * normal;
     vary.color = color;
 
     gl_Position = push.transform * vec4(position, 1.0);
