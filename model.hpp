@@ -6,6 +6,8 @@
 
 #include "device.hpp"
 
+#include "buffer.hpp"
+
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
@@ -54,13 +56,15 @@ namespace aqua {
     private:
         AquaDevice& device;
 
-        VkBuffer vertexBuffer{};
-        VkDeviceMemory vertexBufferMemory{};
+//        VkBuffer vertexBuffer{};
+//        VkDeviceMemory vertexBufferMemory{};
+        std::unique_ptr<Buffer> vertexBuffer;
         uint32_t vertexCount{};
 
         bool hasIndexBuffer{false};
-        VkBuffer indexBuffer{};
-        VkDeviceMemory indexBufferMemory{};
+//        VkBuffer indexBuffer{};
+//        VkDeviceMemory indexBufferMemory{};
+        std::unique_ptr<Buffer> indexBuffer;
         uint32_t indexCount{};
     };
 }
