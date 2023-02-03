@@ -59,29 +59,25 @@ namespace aqua {
                 pipelineConfigInfo);
     }
 
-    void SimpleRenderSystem::renderGameObjects(VkCommandBuffer commandBuffer, std::vector<GameObject> &gameObjects,
-                                               const Camera& camera) {
-        pipeline->bind(commandBuffer);
+    void SimpleRenderSystem::renderGameObjects(FrameInfo& frameInfo, std::vector<GameObject>& gameObjects) {
+        pipeline->bind(frameInfo.commandBuffer);
 
-        auto projectionView = camera.getProjection() * camera.getView();
+        auto projectionView = frameInfo.camera.getProjection() * frameInfo.camera.getView();
 
         for (auto &obj: gameObjects) {
-//            obj.transform.rotation.y = glm::mod(obj.mat.rotation.y + 0.01f, glm::two_pi<float>());
-//            obj.transform.rotation.x = glm::mod(obj.mat.rotation.x + 0.01f, glm::two_pi<float>());
-
             SimplePushConstantData pushConstantData{};
             pushConstantData.transform = projectionView * obj.transform.mat();
             pushConstantData.normalMatrix = obj.transform.normalMat();
 
             vkCmdPushConstants(
-                    commandBuffer,
+                    frameInfo.commandBuffer,
                     pipelineLayout,
                     VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
                     0,
                     sizeof(SimplePushConstantData),
                     &pushConstantData);
-            obj.model->bind(commandBuffer);
-            obj.model->draw(commandBuffer);
+            obj.model->bind(frameInfo.commandBuffer);
+            obj.model->draw(frameInfo.commandBuffer);
         }
     }
 }
