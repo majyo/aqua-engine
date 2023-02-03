@@ -7,8 +7,6 @@
 #include <array>
 
 namespace aqua {
-    std::unique_ptr<Model> createCubeModel(AquaDevice &device, glm::vec3 offset);
-
     Renderer::Renderer(aqua::AquaWindow &window, aqua::AquaDevice &device) : window(window), device(device) {
         recreateSwapChain();
         createCommandBuffers();
