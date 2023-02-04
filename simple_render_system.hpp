@@ -16,7 +16,8 @@
 namespace aqua {
     class SimpleRenderSystem {
     public:
-        SimpleRenderSystem(AquaDevice& device, VkRenderPass renderPass);
+        SimpleRenderSystem(AquaDevice& device, VkRenderPass renderPass,
+                           VkDescriptorSetLayout globalDescriptorSetLayout);
         ~SimpleRenderSystem();
         SimpleRenderSystem(const SimpleRenderSystem& simpleRenderSystem) = delete;
         SimpleRenderSystem& operator=(const SimpleRenderSystem& simpleRenderSystem) = delete;
@@ -24,7 +25,7 @@ namespace aqua {
         void renderGameObjects(FrameInfo& frameInfo, std::vector<GameObject>& gameObjects);
 
     private:
-        void createPipelineLayout();
+        void createPipelineLayout(VkDescriptorSetLayout globalDescriptorSetLayout);
         void createPipeline(VkRenderPass renderPass);
 
     private:

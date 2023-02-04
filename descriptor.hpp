@@ -12,7 +12,7 @@ namespace aqua {
     public:
         class Builder {
         public:
-            Builder(AquaDevice &device) : device{device} {}
+            explicit Builder(AquaDevice &device) : device{device} {}
 
             Builder &addBinding(
                     uint32_t binding,
@@ -46,15 +46,15 @@ namespace aqua {
     public:
         class Builder {
         public:
-            Builder(AquaDevice &lveDevice) : lveDevice{lveDevice} {}
+            Builder(AquaDevice &device) : device{device} {}
 
             Builder &addPoolSize(VkDescriptorType descriptorType, uint32_t count);
             Builder &setPoolFlags(VkDescriptorPoolCreateFlags flags);
             Builder &setMaxSets(uint32_t count);
-            std::unique_ptr<DescriptorPool> build() const;
+            [[nodiscard]] std::unique_ptr<DescriptorPool> build() const;
 
         private:
-            AquaDevice &lveDevice;
+            AquaDevice &device;
             std::vector<VkDescriptorPoolSize> poolSizes{};
             uint32_t maxSets = 1000;
             VkDescriptorPoolCreateFlags poolFlags = 0;
@@ -69,8 +69,7 @@ namespace aqua {
         DescriptorPool(const DescriptorPool &) = delete;
         DescriptorPool &operator=(const DescriptorPool &) = delete;
 
-        bool allocateDescriptor(
-                const VkDescriptorSetLayout descriptorSetLayout, VkDescriptorSet &descriptor) const;
+        bool allocateDescriptor(VkDescriptorSetLayout descriptorSetLayout, VkDescriptorSet &descriptor) const;
 
         void freeDescriptors(std::vector<VkDescriptorSet> &descriptors) const;
 

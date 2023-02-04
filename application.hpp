@@ -10,6 +10,7 @@
 #include "renderer.hpp"
 #include "game_object.hpp"
 #include "simple_render_system.hpp"
+#include "descriptor.hpp"
 
 #include <memory>
 #include <vector>
@@ -35,6 +36,7 @@ namespace aqua {
         AquaWindow aquaWindow{WIDTH, HEIGHT, "Vulkan Demo"};
         AquaDevice device{aquaWindow};
         Renderer renderer{aquaWindow, device};
+        std::unique_ptr<DescriptorPool> globalDescriptorPool{};
         std::vector<GameObject> gameObjects;
     };
 }

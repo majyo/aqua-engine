@@ -74,7 +74,7 @@ namespace aqua {
     }
 
     std::unique_ptr<DescriptorPool> DescriptorPool::Builder::build() const {
-        return std::make_unique<DescriptorPool>(lveDevice, maxSets, poolFlags, poolSizes);
+        return std::make_unique<DescriptorPool>(device, maxSets, poolFlags, poolSizes);
     }
 
 // *************** Descriptor Pool *********************
@@ -102,8 +102,7 @@ namespace aqua {
         vkDestroyDescriptorPool(device.device(), descriptorPool, nullptr);
     }
 
-    bool DescriptorPool::allocateDescriptor(
-            const VkDescriptorSetLayout descriptorSetLayout, VkDescriptorSet &descriptor) const {
+    bool DescriptorPool::allocateDescriptor(VkDescriptorSetLayout descriptorSetLayout, VkDescriptorSet &descriptor) const {
         VkDescriptorSetAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
         allocInfo.descriptorPool = descriptorPool;
