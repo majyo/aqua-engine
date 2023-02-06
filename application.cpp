@@ -11,14 +11,18 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "vendors/stb_image.h"
+
 #include <array>
 #include <iostream>
 #include <numeric>
 
 namespace aqua {
     struct GlobalUBO {
-        alignas(16) glm::mat4 projectionView{1.0f};
-        alignas(16) glm::vec3 lightDirection = glm::normalize(glm::vec3(1.0f, 1.0f, 1.0f));
+        glm::mat4 projectionView{1.0f};
+        glm::vec4 lightDirection = glm::vec4(glm::normalize(glm::vec3(2.0f, 1.5f, 1.0f)), 0.0f);
+        glm::vec4 viewPosition{0.0f, 0.0f, 1.0f, 0.0f};
     };
 
     Application::Application() {
@@ -46,7 +50,7 @@ namespace aqua {
         }
 
         auto globalSetLayout = DescriptorSetLayout::Builder(device)
-                .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)
+                .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT)
                 .build();
 
         std::vector<VkDescriptorSet> globalDescriptorSets(SwapChain::MAX_FRAMES_IN_FLIGHT);
@@ -97,7 +101,8 @@ namespace aqua {
                 // update
                 GlobalUBO ubo{};
                 ubo.projectionView = camera.getProjection() * camera.getView();
-//                glm::vec4 test = ubo.projectionView * glm::vec4(1.0f);
+                ubo.viewPosition = glm::vec4(viewer.transform.translation, 0.0f);
+//                glm::vec3 test = viewer.transform.translation;
 //                std::cout << test.x << ", " << test.y << ", " << test.z << std::endl;
                 uboBuffers[frameIndex]->writeToBuffer(&ubo);
                 uboBuffers[frameIndex]->flush();
@@ -114,12 +119,51 @@ namespace aqua {
     }
 
     void Application::loadGameObject() {
-        std::shared_ptr<Model> model = Model::createModelFromFile(device, "../models/smooth_vase.obj");
+        std::shared_ptr<Model> model = Model::createModelFromFile(device, "../models/cube.obj");
         auto gameObject = GameObject::createGameObject();
         gameObject.model = model;
-//        gameObject.mat.scale = {1.0f, 1.0f, 1.0f};
-        gameObject.transform.scale = {5.0f, 5.0f, 5.0f};
-        gameObject.transform.rotation = {0.0f, 0.0f, glm::pi<float>()};
+        gameObject.transform.scale = {1.0f, 1.0f, 1.0f};
+//        gameObject.transform.scale = {7.0f, 7.0f, 7.0f};
+//        gameObject.transform.rotation = {0.0f, 0.0f, glm::pi<float>()};
         gameObjects.push_back(std::move(gameObject));
+    }
+
+    void Application::createTextureImage() {
+        int texWidth, texHeight, texChannel;
+        stbi_uc* pixels = stbi_load("../textures/texture.jpg", &texWidth, &texHeight, &texChannel, STBI_rgb_alpha);
+        VkDeviceSize imageSize = texWidth * texHeight * 4;
+
+        if (!pixels) {
+            throw std::runtime_error("Failed to load texture image");
+        }
+
+        Buffer stagingBuffer{
+            device,
+            imageSize,
+            1,
+            VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+        };
+        stagingBuffer.map();
+        stagingBuffer.writeToBuffer((void*) pixels);
+        stbi_image_free(pixels);
+
+        VkImageCreateInfo imageCreateInfo{};
+        imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+        imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
+        imageCreateInfo.extent.width = static_cast<uint32_t>(texWidth);
+        imageCreateInfo.extent.height = static_cast<uint32_t>(texHeight);
+        imageCreateInfo.extent.depth = 1;
+        imageCreateInfo.mipLevels = 1;
+        imageCreateInfo.arrayLayers = 1;
+        imageCreateInfo.format = VK_FORMAT_R8G8B8A8_SRGB;
+        imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+        imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        imageCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+        imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+        imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+        imageCreateInfo.flags = 0;
+
+        device.createImageWithInfo(imageCreateInfo, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, textureImage, textureImageMemory);
     }
 }

@@ -31,6 +31,7 @@ namespace aqua {
 
     private:
         void loadGameObject();
+        void createTextureImage();
 
     private:
         AquaWindow aquaWindow{WIDTH, HEIGHT, "Vulkan Demo"};
@@ -38,5 +39,9 @@ namespace aqua {
         Renderer renderer{aquaWindow, device};
         std::unique_ptr<DescriptorPool> globalDescriptorPool{};
         std::vector<GameObject> gameObjects;
+
+        // Temp
+        VkImage textureImage;
+        VkDeviceMemory textureImageMemory;
     };
 }
