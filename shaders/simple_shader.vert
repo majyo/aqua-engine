@@ -26,7 +26,7 @@ void main() {
     vec4 positionWS = push.modelMatrix * vec4(position, 1.0);
 
     vary.positionWS = vec3(positionWS);
-    vary.normalWS = mat3(push.normalMatrix) * normal;
+    vary.normalWS = mat3(push.normalMatrix) * normalize(normal);
     vary.color = color;
 
     gl_Position = ubo.projectionViewMatrix * positionWS;

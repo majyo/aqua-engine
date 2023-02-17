@@ -35,6 +35,8 @@ namespace aqua {
     }
 
     Application::~Application() {
+        vkDestroyImage(device.device(), textureImage, nullptr);
+        vkFreeMemory(device.device(), textureImageMemory, nullptr);
     }
 
     void Application::run() {
@@ -72,6 +74,8 @@ namespace aqua {
         auto currentTime = std::chrono::high_resolution_clock::now();
 
         KeyboardMovementController::SurroundingOrbit orbit{{0.0f, 0.0f, 0.0f}, 10.0f, glm::half_pi<float>(), 0.0f};
+
+        createTextureImage();
 
         while (!aquaWindow.shouldClose()) {
             glfwPollEvents();
@@ -129,14 +133,16 @@ namespace aqua {
     }
 
     void Application::createTextureImage() {
+        // Read image data using stb_image
         int texWidth, texHeight, texChannel;
-        stbi_uc* pixels = stbi_load("../textures/texture.jpg", &texWidth, &texHeight, &texChannel, STBI_rgb_alpha);
+        stbi_uc* pixels = stbi_load("../Textures/texture.jpg", &texWidth, &texHeight, &texChannel, STBI_rgb_alpha);
         VkDeviceSize imageSize = texWidth * texHeight * 4;
 
         if (!pixels) {
             throw std::runtime_error("Failed to load texture image");
         }
 
+        // Create staging buffer adn write image data to it
         Buffer stagingBuffer{
             device,
             imageSize,
@@ -148,6 +154,7 @@ namespace aqua {
         stagingBuffer.writeToBuffer((void*) pixels);
         stbi_image_free(pixels);
 
+        // Create image
         VkImageCreateInfo imageCreateInfo{};
         imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
         imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
@@ -165,5 +172,13 @@ namespace aqua {
         imageCreateInfo.flags = 0;
 
         device.createImageWithInfo(imageCreateInfo, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, textureImage, textureImageMemory);
+
+        // Copy data from staging buffer to image
+        device.transitionImageLayout(textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED,
+                                     VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+        device.copyBufferToImage(stagingBuffer.getBuffer(), textureImage, static_cast<uint32_t>(texWidth),
+                                 static_cast<uint32_t>(texHeight), 1);
+        device.transitionImageLayout(textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                                     VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     }
 }
