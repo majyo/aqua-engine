@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "Defines.h"
+#include "Defines.hpp"
 
 #include "game_object.hpp"
 #include "aqua_window.hpp"

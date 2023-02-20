@@ -23,6 +23,7 @@ namespace aqua
         _globalDescriptorPool = DescriptorPool::Builder(_aquaDevice)
                 .setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT)
                 .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
+                .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, SwapChain::MAX_FRAMES_IN_FLIGHT)
                 .build();
 
         loadGameObject();
@@ -30,12 +31,18 @@ namespace aqua
 
     Application::~Application()
     {
+        vkDestroySampler(_aquaDevice.device(), _textureSampler, nullptr);
+        vkDestroyImageView(_aquaDevice.device(), _textureImageView, nullptr);
         vkDestroyImage(_aquaDevice.device(), _textureImage, nullptr);
         vkFreeMemory(_aquaDevice.device(), _textureImageMemory, nullptr);
     }
 
     void Application::run()
     {
+        createTextureImage();
+        createTextureImageView();
+        createTextureSampler();
+
         std::vector<std::unique_ptr<Buffer>> uboBuffers(SwapChain::MAX_FRAMES_IN_FLIGHT);
         for (auto& uboBuffer: uboBuffers)
         {
@@ -49,8 +56,8 @@ namespace aqua
         }
 
         auto globalSetLayout = DescriptorSetLayout::Builder(_aquaDevice)
-                .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                            VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT)
+                .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT)
+                .addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
                 .build();
 
         std::vector<VkDescriptorSet> globalDescriptorSets(SwapChain::MAX_FRAMES_IN_FLIGHT);
@@ -58,8 +65,15 @@ namespace aqua
         for (int i = 0; i < globalDescriptorSets.size(); ++i)
         {
             auto bufferInfo = uboBuffers[i]->descriptorInfo();
+
+            VkDescriptorImageInfo imageInfo{};
+            imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+            imageInfo.imageView = _textureImageView;
+            imageInfo.sampler = _textureSampler;
+
             DescriptorWriter(*globalSetLayout, *_globalDescriptorPool)
                     .writeBuffer(0, &bufferInfo)
+                    .writeImage(1, &imageInfo)
                     .build(globalDescriptorSets[i]);
         }
 
@@ -75,9 +89,6 @@ namespace aqua
         auto currentTime = std::chrono::high_resolution_clock::now();
 
         KeyboardMovementController::SurroundingOrbit orbit{{0.0f, 0.0f, 0.0f}, 10.0f, glm::half_pi<float>(), 0.0f};
-
-        createTextureImage();
-        createTextureImageView();
 
         while (!_aquaWindow.shouldClose())
         {
@@ -140,7 +151,7 @@ namespace aqua
     {
         // Read image data using stb_image
         int texWidth, texHeight, texChannel;
-        stbi_uc* pixels = stbi_load("../Textures/texture.jpg", &texWidth, &texHeight, &texChannel, STBI_rgb_alpha);
+        stbi_uc* pixels = stbi_load("../Textures/wood_albedo.png", &texWidth, &texHeight, &texChannel, STBI_rgb_alpha);
         VkDeviceSize imageSize = texWidth * texHeight * 4;
 
         if (!pixels)
@@ -203,5 +214,28 @@ namespace aqua
         imageViewCreateInfo.subresourceRange.layerCount = 1;
 
         VK_CHECK(vkCreateImageView(_aquaDevice.device(), &imageViewCreateInfo, nullptr, &_textureImageView))
+    }
+
+    void Application::createTextureSampler()
+    {
+        VkSamplerCreateInfo samplerCreateInfo{};
+        samplerCreateInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+        samplerCreateInfo.magFilter = VK_FILTER_LINEAR;
+        samplerCreateInfo.minFilter = VK_FILTER_LINEAR;
+        samplerCreateInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+        samplerCreateInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+        samplerCreateInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+        samplerCreateInfo.anisotropyEnable = VK_TRUE;
+        samplerCreateInfo.maxAnisotropy = _aquaDevice.properties().limits.maxSamplerAnisotropy;
+        samplerCreateInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
+        samplerCreateInfo.unnormalizedCoordinates = VK_FALSE;
+        samplerCreateInfo.compareEnable = VK_FALSE;
+        samplerCreateInfo.compareOp = VK_COMPARE_OP_ALWAYS;
+        samplerCreateInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+        samplerCreateInfo.mipLodBias = 0.0f;
+        samplerCreateInfo.minLod = 0.0f;
+        samplerCreateInfo.maxLod = 0.0f;
+
+        VK_CHECK(vkCreateSampler(_aquaDevice.device(), &samplerCreateInfo, nullptr, &_textureSampler))
     }
 }

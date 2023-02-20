@@ -3,8 +3,8 @@
 layout (location = 0) in Varyings {
     vec3 positionWS;
     vec3 normalWS;
-    vec3 color;
-} vary;
+    vec2 uv;
+} varyings;
 
 layout (location = 0) out vec4 outColor;
 
@@ -13,6 +13,7 @@ layout (set = 0, binding = 0) uniform GlobalUbo {
     vec4 lightDirection;
     vec4 viewPosition;
 } ubo;
+layout (binding = 1) uniform sampler2D texSampler;
 
 layout (push_constant) uniform Push {
     mat4 modelMatrix;
@@ -27,13 +28,14 @@ const float AMBIENT = 0.05;
 void main() {
     vec3 viewPosWS = vec3(ubo.viewPosition);
     vec3 lightDirWS = normalize(vec3(ubo.lightDirection));
-    vec3 normalWS = normalize(vary.normalWS);
-    vec3 viewDirWS = normalize(viewPosWS - vary.positionWS);
+    vec3 normalWS = normalize(varyings.normalWS);
+    vec3 viewDirWS = normalize(viewPosWS - varyings.positionWS);
     vec3 halfVectorWS = normalize(lightDirWS + viewDirWS);
 
     float diffuseComponent = max(dot(normalWS, lightDirWS), 0.0) * DIFFUSE;
     float specularComponent = pow(max(dot(normalWS, halfVectorWS), 0.0), 32.0) * SPECULAR;
     float lightIntensity = diffuseComponent + specularComponent + AMBIENT;
-    vec3 color = lightIntensity * vary.color;
+    vec3 albedo = texture(texSampler, varyings.uv).rgb;
+    vec3 color = lightIntensity * albedo;
     outColor = vec4(color, 1.0);
 }

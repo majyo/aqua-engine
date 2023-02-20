@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "Defines.h"
+#include "Defines.hpp"
 
 #include "device.hpp"
 #include "buffer.hpp"
@@ -64,14 +64,10 @@ namespace aqua
     private:
         AquaDevice& device;
 
-//        VkBuffer vertexBuffer{};
-//        VkDeviceMemory vertexBufferMemory{};
         std::unique_ptr<Buffer> vertexBuffer;
         uint32_t vertexCount{};
 
         bool hasIndexBuffer{false};
-//        VkBuffer indexBuffer{};
-//        VkDeviceMemory indexBufferMemory{};
         std::unique_ptr<Buffer> indexBuffer;
         uint32_t indexCount{};
     };

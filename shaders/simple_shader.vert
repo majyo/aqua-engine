@@ -8,8 +8,8 @@ layout (location = 3) in vec3 uv;
 layout (location = 0) out Varyings {
     vec3 positionWS;
     vec3 normalWS;
-    vec3 color;
-} vary;
+    vec2 uv;
+} varyings;
 
 layout (set = 0, binding = 0) uniform GlobalUbo {
     mat4 projectionViewMatrix;
@@ -25,9 +25,9 @@ layout (push_constant) uniform Push {
 void main() {
     vec4 positionWS = push.modelMatrix * vec4(position, 1.0);
 
-    vary.positionWS = vec3(positionWS);
-    vary.normalWS = mat3(push.normalMatrix) * normalize(normal);
-    vary.color = color;
+    varyings.positionWS = vec3(positionWS);
+    varyings.normalWS = mat3(push.normalMatrix) * normalize(normal);
+    varyings.uv = uv.xy;
 
     gl_Position = ubo.projectionViewMatrix * positionWS;
 }

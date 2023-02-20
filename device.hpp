@@ -2,7 +2,7 @@
 
 #include "aqua_window.hpp"
 
-#include "Defines.h"
+#include "Defines.hpp"
 
 namespace aqua
 {

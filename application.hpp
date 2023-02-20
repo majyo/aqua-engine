@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "Defines.h"
+#include "Defines.hpp"
 
 #include "camera.hpp"
 #include "aqua_window.hpp"
@@ -38,6 +38,7 @@ namespace aqua
 
         void createTextureImage();
         void createTextureImageView();
+        void createTextureSampler();
 
     private:
         AquaWindow _aquaWindow{WIDTH, HEIGHT, "Vulkan Demo"};
@@ -50,5 +51,6 @@ namespace aqua
         VkImage _textureImage;
         VkDeviceMemory _textureImageMemory;
         VkImageView _textureImageView;
+        VkSampler _textureSampler;
     };
 }
