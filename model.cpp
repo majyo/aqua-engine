@@ -7,16 +7,7 @@
 #include "utils.hpp"
 
 #define TINYOBJLOADER_IMPLEMENTATION
-
 #include "vendors/tiny_obj_loader.h"
-
-#define GLM_ENABLE_EXPERIMENTAL
-
-#include <glm/gtx/hash.hpp>
-
-#include <cassert>
-#include <cstring>
-#include <iostream>
 
 namespace std
 {
@@ -42,12 +33,12 @@ namespace aqua
 
     Model::~Model()
     {
-//        vkDestroyBuffer(device.device(), vertexBuffer, nullptr);
-//        vkFreeMemory(device.device(), vertexBufferMemory, nullptr);
+//        vkDestroyBuffer(_aquaDevice._aquaDevice(), vertexBuffer, nullptr);
+//        vkFreeMemory(_aquaDevice._aquaDevice(), vertexBufferMemory, nullptr);
 
 //        if (hasIndexBuffer) {
-//            vkDestroyBuffer(device.device(), indexBuffer, nullptr);
-//            vkFreeMemory(device.device(), indexBufferMemory, nullptr);
+//            vkDestroyBuffer(_aquaDevice._aquaDevice(), indexBuffer, nullptr);
+//            vkFreeMemory(_aquaDevice._aquaDevice(), indexBufferMemory, nullptr);
 //        }
     }
 

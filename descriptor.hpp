@@ -1,11 +1,8 @@
 #pragma once
 
-#include "device.hpp"
+#include "Defines.h"
 
-// std
-#include <memory>
-#include <unordered_map>
-#include <vector>
+#include "device.hpp"
 
 namespace aqua
 {

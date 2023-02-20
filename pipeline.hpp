@@ -4,12 +4,10 @@
 
 #pragma once
 
+#include "Defines.h"
+
 #include "device.hpp"
-
 #include "model.hpp"
-
-#include <string>
-#include <vector>
 
 namespace aqua
 {

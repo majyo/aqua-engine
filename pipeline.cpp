@@ -4,11 +4,6 @@
 
 #include "pipeline.hpp"
 
-#include <fstream>
-#include <iostream>
-#include <cassert>
-#include <unistd.h>
-
 namespace aqua
 {
     Pipeline::Pipeline(AquaDevice& device, const std::string& vertShaderPath, const std::string& fragShaderPath,

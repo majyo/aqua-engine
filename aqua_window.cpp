@@ -4,9 +4,6 @@
 
 #include "aqua_window.hpp"
 
-#include <utility>
-#include <stdexcept>
-
 namespace aqua
 {
     AquaWindow::AquaWindow(int width, int height, std::string name)

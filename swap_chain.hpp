@@ -1,14 +1,8 @@
 #pragma once
 
+#include "Defines.h"
+
 #include "device.hpp"
-
-// vulkan headers
-#include <vulkan/vulkan.h>
-
-// std lib headers
-#include <string>
-#include <vector>
-#include <memory>
 
 namespace aqua
 {
@@ -46,13 +40,13 @@ namespace aqua
         VkExtent2D getSwapChainExtent()
         { return swapChainExtent; }
 
-        uint32_t width()
+        [[nodiscard]] uint32_t width() const
         { return swapChainExtent.width; }
 
-        uint32_t height()
+        [[nodiscard]] uint32_t height() const
         { return swapChainExtent.height; }
 
-        float extentAspectRatio()
+        [[nodiscard]] float extentAspectRatio() const
         {
             return static_cast<float>(swapChainExtent.width) / static_cast<float>(swapChainExtent.height);
         }
@@ -119,4 +113,4 @@ namespace aqua
         size_t currentFrame = 0;
     };
 
-}  // namespace lve
+}  // namespace aqua

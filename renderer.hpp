@@ -4,14 +4,12 @@
 
 #pragma once
 
+#include "Defines.h"
+
 #include "aqua_window.hpp"
 #include "device.hpp"
 #include "swap_chain.hpp"
 #include "model.hpp"
-
-#include <memory>
-#include <vector>
-#include <cassert>
 
 namespace aqua
 {

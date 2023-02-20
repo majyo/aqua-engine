@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "Defines.h"
+
 #include "camera.hpp"
 #include "aqua_window.hpp"
 #include "device.hpp"
@@ -11,10 +13,6 @@
 #include "game_object.hpp"
 #include "simple_render_system.hpp"
 #include "descriptor.hpp"
-
-#include <memory>
-#include <vector>
-#include <chrono>
 
 namespace aqua
 {
@@ -39,16 +37,18 @@ namespace aqua
         void loadGameObject();
 
         void createTextureImage();
+        void createTextureImageView();
 
     private:
-        AquaWindow aquaWindow{WIDTH, HEIGHT, "Vulkan Demo"};
-        AquaDevice device{aquaWindow};
-        Renderer renderer{aquaWindow, device};
-        std::unique_ptr<DescriptorPool> globalDescriptorPool{};
-        std::vector<GameObject> gameObjects;
+        AquaWindow _aquaWindow{WIDTH, HEIGHT, "Vulkan Demo"};
+        AquaDevice _aquaDevice{_aquaWindow};
+        Renderer _renderer{_aquaWindow, _aquaDevice};
+        std::unique_ptr<DescriptorPool> _globalDescriptorPool{};
+        std::vector<GameObject> _gameObjects;
 
         // Temp
-        VkImage textureImage;
-        VkDeviceMemory textureImageMemory;
+        VkImage _textureImage;
+        VkDeviceMemory _textureImageMemory;
+        VkImageView _textureImageView;
     };
 }

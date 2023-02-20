@@ -1,15 +1,5 @@
 #include "swap_chain.hpp"
 
-// std
-#include <array>
-#include <cstdlib>
-#include <cstring>
-#include <iostream>
-#include <limits>
-#include <set>
-#include <stdexcept>
-#include <utility>
-
 namespace aqua
 {
     SwapChain::SwapChain(AquaDevice& deviceRef, VkExtent2D extent)

@@ -1,9 +1,5 @@
 #include "descriptor.hpp"
 
-// std
-#include <cassert>
-#include <stdexcept>
-
 namespace aqua
 {
 

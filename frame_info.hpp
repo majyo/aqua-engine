@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include "camera.hpp"
+#include "Defines.h"
 
-#include <vulkan/vulkan.h>
+#include "camera.hpp"
 
 namespace aqua
 {

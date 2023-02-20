@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Defines.h"
+
 #include "device.hpp"
 
 namespace aqua

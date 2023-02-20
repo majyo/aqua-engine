@@ -4,14 +4,13 @@
 
 #pragma once
 
+#include "Defines.h"
+
 #include "pipeline.hpp"
 #include "device.hpp"
 #include "game_object.hpp"
 #include "camera.hpp"
 #include "frame_info.hpp"
-
-#include <memory>
-#include <vector>
 
 namespace aqua
 {

@@ -7,10 +7,6 @@
 
 #include "buffer.hpp"
 
-// std
-#include <cassert>
-#include <cstring>
-
 namespace aqua
 {
 
@@ -111,7 +107,7 @@ namespace aqua
     }
 
 /**
- * Flush a memory range of the buffer to make it visible to the device
+ * Flush a memory range of the buffer to make it visible to the _aquaDevice
  *
  * @note Only required for non-coherent memory
  *
@@ -182,7 +178,7 @@ namespace aqua
     }
 
 /**
- *  Flush the memory range at index * alignmentSize of the buffer to make it visible to the device
+ *  Flush the memory range at index * alignmentSize of the buffer to make it visible to the _aquaDevice
  *
  * @param index Used in offset calculation
  *

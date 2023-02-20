@@ -4,11 +4,9 @@
 
 #pragma once
 
+#include "Defines.h"
+
 #include "model.hpp"
-
-#include <glm/gtc/matrix_transform.hpp>
-
-#include <memory>
 
 namespace aqua
 {

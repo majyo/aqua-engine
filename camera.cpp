@@ -4,10 +4,6 @@
 
 #include "camera.hpp"
 
-#include <cassert>
-#include <cmath>
-#include <limits>
-
 namespace aqua
 {
 

@@ -4,9 +4,6 @@
 
 #include "keyboard_movement.hpp"
 
-#include <cmath>
-#include <iostream>
-
 void aqua::KeyboardMovementController::moveInPlaneXZ(GLFWwindow* window, float dt, aqua::GameObject& gameObject)
 {
     glm::vec3 rotation{0.0f};

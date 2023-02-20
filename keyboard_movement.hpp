@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "Defines.h"
+
 #include "game_object.hpp"
 #include "aqua_window.hpp"
 

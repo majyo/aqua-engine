@@ -1,11 +1,5 @@
 #include "device.hpp"
 
-// std headers
-#include <cstring>
-#include <iostream>
-#include <set>
-#include <unordered_set>
-
 namespace aqua
 {
 // local callback functions
@@ -149,7 +143,7 @@ namespace aqua
         }
 
         vkGetPhysicalDeviceProperties(_physicalDevice, &_properties);
-        std::cout << "physical device: " << _properties.deviceName << std::endl;
+        std::cout << "physical _aquaDevice: " << _properties.deviceName << std::endl;
     }
 
     void AquaDevice::createLogicalDevice()
@@ -183,7 +177,7 @@ namespace aqua
         createInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
         createInfo.ppEnabledExtensionNames = deviceExtensions.data();
 
-        // might not really be necessary anymore because device specific validation layers
+        // might not really be necessary anymore because _aquaDevice specific validation layers
         // have been deprecated
         if (enableValidationLayers)
         {
@@ -196,7 +190,7 @@ namespace aqua
 
         if (vkCreateDevice(_physicalDevice, &createInfo, nullptr, &_device) != VK_SUCCESS)
         {
-            throw std::runtime_error("failed to create logical device!");
+            throw std::runtime_error("failed to create logical _aquaDevice!");
         }
 
         vkGetDeviceQueue(_device, indices.graphicsFamily, 0, &_graphicsQueue);

@@ -6,19 +6,8 @@
 
 #include "keyboard_movement.hpp"
 
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-
-#include <glm/glm.hpp>
-#include <glm/gtc/constants.hpp>
-
 #define STB_IMAGE_IMPLEMENTATION
-
 #include "vendors/stb_image.h"
-
-#include <array>
-#include <iostream>
-#include <numeric>
 
 namespace aqua
 {
@@ -31,7 +20,7 @@ namespace aqua
 
     Application::Application()
     {
-        globalDescriptorPool = DescriptorPool::Builder(device)
+        _globalDescriptorPool = DescriptorPool::Builder(_aquaDevice)
                 .setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT)
                 .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
                 .build();
@@ -41,8 +30,8 @@ namespace aqua
 
     Application::~Application()
     {
-        vkDestroyImage(device.device(), textureImage, nullptr);
-        vkFreeMemory(device.device(), textureImageMemory, nullptr);
+        vkDestroyImage(_aquaDevice.device(), _textureImage, nullptr);
+        vkFreeMemory(_aquaDevice.device(), _textureImageMemory, nullptr);
     }
 
     void Application::run()
@@ -51,7 +40,7 @@ namespace aqua
         for (auto& uboBuffer: uboBuffers)
         {
             uboBuffer = std::make_unique<Buffer>(
-                    device,
+                    _aquaDevice,
                     sizeof(GlobalUBO),
                     1,
                     VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
@@ -59,7 +48,7 @@ namespace aqua
             uboBuffer->map();
         }
 
-        auto globalSetLayout = DescriptorSetLayout::Builder(device)
+        auto globalSetLayout = DescriptorSetLayout::Builder(_aquaDevice)
                 .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
                             VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT)
                 .build();
@@ -69,12 +58,12 @@ namespace aqua
         for (int i = 0; i < globalDescriptorSets.size(); ++i)
         {
             auto bufferInfo = uboBuffers[i]->descriptorInfo();
-            DescriptorWriter(*globalSetLayout, *globalDescriptorPool)
+            DescriptorWriter(*globalSetLayout, *_globalDescriptorPool)
                     .writeBuffer(0, &bufferInfo)
                     .build(globalDescriptorSets[i]);
         }
 
-        SimpleRenderSystem simpleRenderSystem{device, renderer.getSwapChainRenderPass(),
+        SimpleRenderSystem simpleRenderSystem{_aquaDevice, _renderer.getSwapChainRenderPass(),
                                               globalSetLayout->getDescriptorSetLayout()};
         Camera camera{};
         camera.setViewDirection(glm::vec3(0.0f, 0.0f, 10.0f), glm::vec3(0.0f, 0.0f, -1.0f),
@@ -88,8 +77,9 @@ namespace aqua
         KeyboardMovementController::SurroundingOrbit orbit{{0.0f, 0.0f, 0.0f}, 10.0f, glm::half_pi<float>(), 0.0f};
 
         createTextureImage();
+        createTextureImageView();
 
-        while (!aquaWindow.shouldClose())
+        while (!_aquaWindow.shouldClose())
         {
             glfwPollEvents();
 
@@ -97,18 +87,18 @@ namespace aqua
             auto frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
             currentTime = newTime;
 
-//            cameraController.moveInPlaneXZ(aquaWindow.getGLFWWindow(), frameTime, viewer);
+//            cameraController.moveInPlaneXZ(_aquaWindow.getGLFWWindow(), frameTime, viewer);
 //            camera.setViewYXZ(viewer.modelMatrix.translation, viewer.mat.rotation);
-            cameraController.moveEncircle(aquaWindow.getGLFWWindow(), orbit, viewer);
+            cameraController.moveEncircle(_aquaWindow.getGLFWWindow(), orbit, viewer);
             camera.setViewDirection(viewer.transform.translation, -viewer.transform.rotation,
                                     glm::vec3(0.0f, 1.0f, 0.0f));
 
-            float aspectRatio = renderer.getAspectRatio();
+            float aspectRatio = _renderer.getAspectRatio();
             camera.setPerspectiveProjection(glm::radians(50.0f), aspectRatio, 0.1f, 100.0f);
 
-            if (auto commandBuffer = renderer.beginFrame())
+            if (auto commandBuffer = _renderer.beginFrame())
             {
-                int frameIndex = renderer.getFrameIndex();
+                int frameIndex = _renderer.getFrameIndex();
                 FrameInfo frameInfo{
                         frameIndex,
                         frameTime,
@@ -125,25 +115,25 @@ namespace aqua
                 uboBuffers[frameIndex]->flush();
 
                 // render
-                renderer.beginSwapChainRenderPass(commandBuffer);
-                simpleRenderSystem.renderGameObjects(frameInfo, gameObjects);
-                renderer.endSwapChainRenderPass(commandBuffer);
-                renderer.endFrame();
+                _renderer.beginSwapChainRenderPass(commandBuffer);
+                simpleRenderSystem.renderGameObjects(frameInfo, _gameObjects);
+                _renderer.endSwapChainRenderPass(commandBuffer);
+                _renderer.endFrame();
             }
         }
 
-        vkDeviceWaitIdle(device.device());
+        vkDeviceWaitIdle(_aquaDevice.device());
     }
 
     void Application::loadGameObject()
     {
-        std::shared_ptr<Model> model = Model::createModelFromFile(device, "../models/cube.obj");
+        std::shared_ptr<Model> model = Model::createModelFromFile(_aquaDevice, "../models/cube.obj");
         auto gameObject = GameObject::createGameObject();
         gameObject.model = model;
         gameObject.transform.scale = {1.0f, 1.0f, 1.0f};
 //        gameObject.transform.scale = {7.0f, 7.0f, 7.0f};
 //        gameObject.transform.rotation = {0.0f, 0.0f, glm::pi<float>()};
-        gameObjects.push_back(std::move(gameObject));
+        _gameObjects.push_back(std::move(gameObject));
     }
 
     void Application::createTextureImage()
@@ -160,7 +150,7 @@ namespace aqua
 
         // Create staging buffer adn write image data to it
         Buffer stagingBuffer{
-                device,
+                _aquaDevice,
                 imageSize,
                 1,
                 VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
@@ -187,15 +177,31 @@ namespace aqua
         imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
         imageCreateInfo.flags = 0;
 
-        device.createImageWithInfo(imageCreateInfo, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, textureImage,
-                                   textureImageMemory);
+        _aquaDevice.createImageWithInfo(imageCreateInfo, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, _textureImage,
+                                        _textureImageMemory);
 
         // Copy data from staging buffer to image
-        device.transitionImageLayout(textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED,
-                                     VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-        device.copyBufferToImage(stagingBuffer.getBuffer(), textureImage, static_cast<uint32_t>(texWidth),
-                                 static_cast<uint32_t>(texHeight), 1);
-        device.transitionImageLayout(textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-                                     VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        _aquaDevice.transitionImageLayout(_textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED,
+                                          VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+        _aquaDevice.copyBufferToImage(stagingBuffer.getBuffer(), _textureImage, static_cast<uint32_t>(texWidth),
+                                      static_cast<uint32_t>(texHeight), 1);
+        _aquaDevice.transitionImageLayout(_textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                                          VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    }
+
+    void Application::createTextureImageView()
+    {
+        VkImageViewCreateInfo imageViewCreateInfo{};
+        imageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+        imageViewCreateInfo.image = _textureImage;
+        imageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+        imageViewCreateInfo.format = VK_FORMAT_R8G8B8A8_SRGB;
+        imageViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        imageViewCreateInfo.subresourceRange.baseMipLevel = 0;
+        imageViewCreateInfo.subresourceRange.levelCount = 1;
+        imageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
+        imageViewCreateInfo.subresourceRange.layerCount = 1;
+
+        VK_CHECK(vkCreateImageView(_aquaDevice.device(), &imageViewCreateInfo, nullptr, &_textureImageView))
     }
 }
