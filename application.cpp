@@ -8,24 +8,29 @@
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
+
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 
 #define STB_IMAGE_IMPLEMENTATION
+
 #include "vendors/stb_image.h"
 
 #include <array>
 #include <iostream>
 #include <numeric>
 
-namespace aqua {
-    struct GlobalUBO {
+namespace aqua
+{
+    struct GlobalUBO
+    {
         glm::mat4 projectionView{1.0f};
         glm::vec4 lightDirection = glm::vec4(glm::normalize(glm::vec3(2.0f, 1.5f, 1.0f)), 0.0f);
         glm::vec4 viewPosition{0.0f, 0.0f, 1.0f, 0.0f};
     };
 
-    Application::Application() {
+    Application::Application()
+    {
         globalDescriptorPool = DescriptorPool::Builder(device)
                 .setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT)
                 .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
@@ -34,14 +39,17 @@ namespace aqua {
         loadGameObject();
     }
 
-    Application::~Application() {
+    Application::~Application()
+    {
         vkDestroyImage(device.device(), textureImage, nullptr);
         vkFreeMemory(device.device(), textureImageMemory, nullptr);
     }
 
-    void Application::run() {
+    void Application::run()
+    {
         std::vector<std::unique_ptr<Buffer>> uboBuffers(SwapChain::MAX_FRAMES_IN_FLIGHT);
-        for (auto& uboBuffer : uboBuffers) {
+        for (auto& uboBuffer: uboBuffers)
+        {
             uboBuffer = std::make_unique<Buffer>(
                     device,
                     sizeof(GlobalUBO),
@@ -52,21 +60,25 @@ namespace aqua {
         }
 
         auto globalSetLayout = DescriptorSetLayout::Builder(device)
-                .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT)
+                .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+                            VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT)
                 .build();
 
         std::vector<VkDescriptorSet> globalDescriptorSets(SwapChain::MAX_FRAMES_IN_FLIGHT);
 
-        for (int i = 0; i < globalDescriptorSets.size(); ++i) {
+        for (int i = 0; i < globalDescriptorSets.size(); ++i)
+        {
             auto bufferInfo = uboBuffers[i]->descriptorInfo();
             DescriptorWriter(*globalSetLayout, *globalDescriptorPool)
-            .writeBuffer(0, &bufferInfo)
-            .build(globalDescriptorSets[i]);
+                    .writeBuffer(0, &bufferInfo)
+                    .build(globalDescriptorSets[i]);
         }
 
-        SimpleRenderSystem simpleRenderSystem{device, renderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout()};
+        SimpleRenderSystem simpleRenderSystem{device, renderer.getSwapChainRenderPass(),
+                                              globalSetLayout->getDescriptorSetLayout()};
         Camera camera{};
-        camera.setViewDirection(glm::vec3(0.0f, 0.0f, 10.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        camera.setViewDirection(glm::vec3(0.0f, 0.0f, 10.0f), glm::vec3(0.0f, 0.0f, -1.0f),
+                                glm::vec3(0.0f, 1.0f, 0.0f));
 
         auto viewer = GameObject::createGameObject();
         KeyboardMovementController cameraController{};
@@ -77,7 +89,8 @@ namespace aqua {
 
         createTextureImage();
 
-        while (!aquaWindow.shouldClose()) {
+        while (!aquaWindow.shouldClose())
+        {
             glfwPollEvents();
 
             auto newTime = std::chrono::high_resolution_clock::now();
@@ -87,27 +100,27 @@ namespace aqua {
 //            cameraController.moveInPlaneXZ(aquaWindow.getGLFWWindow(), frameTime, viewer);
 //            camera.setViewYXZ(viewer.modelMatrix.translation, viewer.mat.rotation);
             cameraController.moveEncircle(aquaWindow.getGLFWWindow(), orbit, viewer);
-            camera.setViewDirection(viewer.transform.translation, -viewer.transform.rotation, glm::vec3(0.0f, 1.0f, 0.0f));
+            camera.setViewDirection(viewer.transform.translation, -viewer.transform.rotation,
+                                    glm::vec3(0.0f, 1.0f, 0.0f));
 
             float aspectRatio = renderer.getAspectRatio();
             camera.setPerspectiveProjection(glm::radians(50.0f), aspectRatio, 0.1f, 100.0f);
 
-            if (auto commandBuffer = renderer.beginFrame()) {
+            if (auto commandBuffer = renderer.beginFrame())
+            {
                 int frameIndex = renderer.getFrameIndex();
                 FrameInfo frameInfo{
-                    frameIndex,
-                    frameTime,
-                    commandBuffer,
-                    camera,
-                    globalDescriptorSets[frameIndex]
+                        frameIndex,
+                        frameTime,
+                        commandBuffer,
+                        camera,
+                        globalDescriptorSets[frameIndex]
                 };
 
                 // update
                 GlobalUBO ubo{};
                 ubo.projectionView = camera.getProjection() * camera.getView();
                 ubo.viewPosition = glm::vec4(viewer.transform.translation, 0.0f);
-//                glm::vec3 test = viewer.transform.translation;
-//                std::cout << test.x << ", " << test.y << ", " << test.z << std::endl;
                 uboBuffers[frameIndex]->writeToBuffer(&ubo);
                 uboBuffers[frameIndex]->flush();
 
@@ -122,7 +135,8 @@ namespace aqua {
         vkDeviceWaitIdle(device.device());
     }
 
-    void Application::loadGameObject() {
+    void Application::loadGameObject()
+    {
         std::shared_ptr<Model> model = Model::createModelFromFile(device, "../models/cube.obj");
         auto gameObject = GameObject::createGameObject();
         gameObject.model = model;
@@ -132,23 +146,25 @@ namespace aqua {
         gameObjects.push_back(std::move(gameObject));
     }
 
-    void Application::createTextureImage() {
+    void Application::createTextureImage()
+    {
         // Read image data using stb_image
         int texWidth, texHeight, texChannel;
         stbi_uc* pixels = stbi_load("../Textures/texture.jpg", &texWidth, &texHeight, &texChannel, STBI_rgb_alpha);
         VkDeviceSize imageSize = texWidth * texHeight * 4;
 
-        if (!pixels) {
+        if (!pixels)
+        {
             throw std::runtime_error("Failed to load texture image");
         }
 
         // Create staging buffer adn write image data to it
         Buffer stagingBuffer{
-            device,
-            imageSize,
-            1,
-            VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+                device,
+                imageSize,
+                1,
+                VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
         };
         stagingBuffer.map();
         stagingBuffer.writeToBuffer((void*) pixels);
@@ -171,7 +187,8 @@ namespace aqua {
         imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
         imageCreateInfo.flags = 0;
 
-        device.createImageWithInfo(imageCreateInfo, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, textureImage, textureImageMemory);
+        device.createImageWithInfo(imageCreateInfo, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, textureImage,
+                                   textureImageMemory);
 
         // Copy data from staging buffer to image
         device.transitionImageLayout(textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED,

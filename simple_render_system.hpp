@@ -13,19 +13,25 @@
 #include <memory>
 #include <vector>
 
-namespace aqua {
-    class SimpleRenderSystem {
+namespace aqua
+{
+    class SimpleRenderSystem
+    {
     public:
         SimpleRenderSystem(AquaDevice& device, VkRenderPass renderPass,
                            VkDescriptorSetLayout globalDescriptorSetLayout);
+
         ~SimpleRenderSystem();
+
         SimpleRenderSystem(const SimpleRenderSystem& simpleRenderSystem) = delete;
+
         SimpleRenderSystem& operator=(const SimpleRenderSystem& simpleRenderSystem) = delete;
 
         void renderGameObjects(FrameInfo& frameInfo, std::vector<GameObject>& gameObjects);
 
     private:
         void createPipelineLayout(VkDescriptorSetLayout globalDescriptorSetLayout);
+
         void createPipeline(VkRenderPass renderPass);
 
     private:

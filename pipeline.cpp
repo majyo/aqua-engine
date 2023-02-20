@@ -9,9 +9,11 @@
 #include <cassert>
 #include <unistd.h>
 
-namespace aqua {
-    Pipeline::Pipeline(AquaDevice& device, const std::string &vertShaderPath, const std::string &fragShaderPath,
-                       const PipelineConfigInfo& configInfo) : device(device) {
+namespace aqua
+{
+    Pipeline::Pipeline(AquaDevice& device, const std::string& vertShaderPath, const std::string& fragShaderPath,
+                       const PipelineConfigInfo& configInfo) : device(device)
+    {
         char buffer[256];
         getcwd(buffer, 256);
         std::cout << buffer << std::endl;
@@ -19,20 +21,24 @@ namespace aqua {
         createGraphicsPipeline(vertShaderPath, fragShaderPath, configInfo);
     }
 
-    Pipeline::~Pipeline() {
+    Pipeline::~Pipeline()
+    {
         vkDestroyShaderModule(device.device(), vertShaderModule, nullptr);
         vkDestroyShaderModule(device.device(), fragShaderModule, nullptr);
         vkDestroyPipeline(device.device(), graphicsPipeline, nullptr);
     }
 
-    void Pipeline::bind(VkCommandBuffer commandBuffer) {
+    void Pipeline::bind(VkCommandBuffer commandBuffer)
+    {
         vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
     }
 
-    std::vector<char> Pipeline::readFile(const std::string &filePath) {
+    std::vector<char> Pipeline::readFile(const std::string& filePath)
+    {
         std::ifstream file{filePath, std::ios::ate | std::ios::binary};
 
-        if (!file.is_open()) {
+        if (!file.is_open())
+        {
             throw std::runtime_error("Failed to open file: " + filePath);
         }
 
@@ -45,12 +51,13 @@ namespace aqua {
         return buffer;
     }
 
-    void Pipeline::createGraphicsPipeline(const std::string &vertShaderPath, const std::string &fragShaderPath,
-                                          const PipelineConfigInfo& configInfo) {
+    void Pipeline::createGraphicsPipeline(const std::string& vertShaderPath, const std::string& fragShaderPath,
+                                          const PipelineConfigInfo& configInfo)
+    {
         assert(configInfo.pipelineLayout != VK_NULL_HANDLE &&
-        "Cannot create graphics pipeline:: no pipelineLayout provided in configInfo");
+               "Cannot create graphics pipeline:: no pipelineLayout provided in configInfo");
         assert(configInfo.renderPass != VK_NULL_HANDLE &&
-        "Cannot create graphics pipeline:: no renderPass provided in configInfo");
+               "Cannot create graphics pipeline:: no renderPass provided in configInfo");
 
         // Create shader modules
         auto vertCode = readFile(vertShaderPath);
@@ -122,26 +129,27 @@ namespace aqua {
 
         // Create graphics pipeline
         if (vkCreateGraphicsPipelines(device.device(), VK_NULL_HANDLE, 1, &pipelineCreateInfo, nullptr,
-                                      &graphicsPipeline) != VK_SUCCESS) {
+                                      &graphicsPipeline) != VK_SUCCESS)
+        {
             throw std::runtime_error("Failed to create graphics pipeline");
         }
     }
 
-    void Pipeline::createShaderModule(const std::vector<char> &code, VkShaderModule *shaderModule) {
+    void Pipeline::createShaderModule(const std::vector<char>& code, VkShaderModule* shaderModule)
+    {
         VkShaderModuleCreateInfo createInfo{};
         createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
         createInfo.codeSize = code.size();
         createInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
 
-        if (vkCreateShaderModule(device.device(), &createInfo, nullptr, shaderModule) != VK_SUCCESS) {
+        if (vkCreateShaderModule(device.device(), &createInfo, nullptr, shaderModule) != VK_SUCCESS)
+        {
             throw std::runtime_error("Failed to create shader module");
         }
     }
 
-    void Pipeline::setAsDefaultPipelineConfigInfo(PipelineConfigInfo& configInfo) {
-//        std::cout << "Extent Width: " << width << std::endl;
-//        std::cout << "Extent Height: " << height << std::endl;
-
+    void Pipeline::setAsDefaultPipelineConfigInfo(PipelineConfigInfo& configInfo)
+    {
         configInfo.inputAssemblyStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
         configInfo.inputAssemblyStateCreateInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
         configInfo.inputAssemblyStateCreateInfo.primitiveRestartEnable = VK_FALSE;
@@ -190,7 +198,7 @@ namespace aqua {
         configInfo.colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
         configInfo.colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD;
         configInfo.colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT |
-                VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+                                                         VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
 
         configInfo.colorBlendInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
         configInfo.colorBlendInfo.logicOpEnable = VK_FALSE;

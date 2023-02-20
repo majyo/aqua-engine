@@ -7,12 +7,15 @@
 #include <cstdlib>
 #include <iostream>
 
-int main() {
+int main()
+{
     aqua::Application app{};
 
-    try {
+    try
+    {
         app.run();
-    } catch (const std::exception& exception) {
+    } catch (const std::exception& exception)
+    {
         std::cerr << exception.what() << std::endl;
         return EXIT_FAILURE;
     }

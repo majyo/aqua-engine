@@ -8,26 +8,32 @@
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
+
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 
-struct SimplePushConstantData {
+struct SimplePushConstantData
+{
     glm::mat4 modelMatrix{1.0f};
     glm::mat4 normalMatrix{1.0f};
 };
 
-namespace aqua {
-    SimpleRenderSystem::SimpleRenderSystem(aqua::AquaDevice &device, VkRenderPass renderPass,
-                                           VkDescriptorSetLayout globalDescriptorSetLayout) : device(device) {
+namespace aqua
+{
+    SimpleRenderSystem::SimpleRenderSystem(aqua::AquaDevice& device, VkRenderPass renderPass,
+                                           VkDescriptorSetLayout globalDescriptorSetLayout) : device(device)
+    {
         createPipelineLayout(globalDescriptorSetLayout);
         createPipeline(renderPass);
     }
 
-    SimpleRenderSystem::~SimpleRenderSystem() {
+    SimpleRenderSystem::~SimpleRenderSystem()
+    {
         vkDestroyPipelineLayout(device.device(), pipelineLayout, nullptr);
     }
 
-    void SimpleRenderSystem::createPipelineLayout(VkDescriptorSetLayout globalDescriptorSetLayout) {
+    void SimpleRenderSystem::createPipelineLayout(VkDescriptorSetLayout globalDescriptorSetLayout)
+    {
         VkPushConstantRange pushConstantRange{};
         pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
         pushConstantRange.offset = 0;
@@ -43,12 +49,14 @@ namespace aqua {
         pipelineLayoutCreateInfo.pPushConstantRanges = &pushConstantRange;
 
         if (vkCreatePipelineLayout(device.device(), &pipelineLayoutCreateInfo, nullptr, &pipelineLayout) !=
-            VK_SUCCESS) {
+            VK_SUCCESS)
+        {
             throw std::runtime_error("Failed to create pipeline layout");
         }
     }
 
-    void SimpleRenderSystem::createPipeline(VkRenderPass renderPass) {
+    void SimpleRenderSystem::createPipeline(VkRenderPass renderPass)
+    {
         assert(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout.");
 
         PipelineConfigInfo pipelineConfigInfo{};
@@ -62,7 +70,8 @@ namespace aqua {
                 pipelineConfigInfo);
     }
 
-    void SimpleRenderSystem::renderGameObjects(FrameInfo& frameInfo, std::vector<GameObject>& gameObjects) {
+    void SimpleRenderSystem::renderGameObjects(FrameInfo& frameInfo, std::vector<GameObject>& gameObjects)
+    {
         pipeline->bind(frameInfo.commandBuffer);
 
         vkCmdBindDescriptorSets(frameInfo.commandBuffer,
@@ -74,7 +83,8 @@ namespace aqua {
                                 0,
                                 nullptr);
 
-        for (auto &obj: gameObjects) {
+        for (auto& obj: gameObjects)
+        {
             SimplePushConstantData pushConstantData{};
             pushConstantData.modelMatrix = obj.transform.mat();
             pushConstantData.normalMatrix = obj.transform.normalMat();

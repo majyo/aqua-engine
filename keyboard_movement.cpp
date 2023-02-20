@@ -7,15 +7,21 @@
 #include <cmath>
 #include <iostream>
 
-void aqua::KeyboardMovementController::moveInPlaneXZ(GLFWwindow *window, float dt, aqua::GameObject &gameObject) {
+void aqua::KeyboardMovementController::moveInPlaneXZ(GLFWwindow* window, float dt, aqua::GameObject& gameObject)
+{
     glm::vec3 rotation{0.0f};
 
-    if (glfwGetKey(window, keyMappings.lookRight) == GLFW_PRESS) { rotation.y += 1.0f; }
-    if (glfwGetKey(window, keyMappings.lookLeft) == GLFW_PRESS) { rotation.y -= 1.0f; }
-    if (glfwGetKey(window, keyMappings.lookUp) == GLFW_PRESS) { rotation.x += 1.0f; }
-    if (glfwGetKey(window, keyMappings.lookDown) == GLFW_PRESS) { rotation.x -= 1.0f; }
+    if (glfwGetKey(window, keyMappings.lookRight) == GLFW_PRESS)
+    { rotation.y += 1.0f; }
+    if (glfwGetKey(window, keyMappings.lookLeft) == GLFW_PRESS)
+    { rotation.y -= 1.0f; }
+    if (glfwGetKey(window, keyMappings.lookUp) == GLFW_PRESS)
+    { rotation.x += 1.0f; }
+    if (glfwGetKey(window, keyMappings.lookDown) == GLFW_PRESS)
+    { rotation.x -= 1.0f; }
 
-    if (glm::dot(rotation, rotation) > std::numeric_limits<float>::epsilon()) {
+    if (glm::dot(rotation, rotation) > std::numeric_limits<float>::epsilon())
+    {
         gameObject.transform.rotation += lookSpeed * dt * glm::normalize(rotation);
     }
 
@@ -29,20 +35,28 @@ void aqua::KeyboardMovementController::moveInPlaneXZ(GLFWwindow *window, float d
 
     glm::vec3 moveDirection{0.0f};
 
-    if (glfwGetKey(window, keyMappings.moveForward) == GLFW_PRESS) { moveDirection += forwardDirection; }
-    if (glfwGetKey(window, keyMappings.moveBackward) == GLFW_PRESS) { moveDirection -= forwardDirection; }
-    if (glfwGetKey(window, keyMappings.moveRight) == GLFW_PRESS) { moveDirection += rightDirection; }
-    if (glfwGetKey(window, keyMappings.moveLeft) == GLFW_PRESS) { moveDirection -= rightDirection; }
-    if (glfwGetKey(window, keyMappings.moveUp) == GLFW_PRESS) { moveDirection += upDirection; }
-    if (glfwGetKey(window, keyMappings.moveDown) == GLFW_PRESS) { moveDirection -= upDirection; }
+    if (glfwGetKey(window, keyMappings.moveForward) == GLFW_PRESS)
+    { moveDirection += forwardDirection; }
+    if (glfwGetKey(window, keyMappings.moveBackward) == GLFW_PRESS)
+    { moveDirection -= forwardDirection; }
+    if (glfwGetKey(window, keyMappings.moveRight) == GLFW_PRESS)
+    { moveDirection += rightDirection; }
+    if (glfwGetKey(window, keyMappings.moveLeft) == GLFW_PRESS)
+    { moveDirection -= rightDirection; }
+    if (glfwGetKey(window, keyMappings.moveUp) == GLFW_PRESS)
+    { moveDirection += upDirection; }
+    if (glfwGetKey(window, keyMappings.moveDown) == GLFW_PRESS)
+    { moveDirection -= upDirection; }
 
-    if (glm::dot(moveDirection, moveDirection) > std::numeric_limits<float>::epsilon()) {
+    if (glm::dot(moveDirection, moveDirection) > std::numeric_limits<float>::epsilon())
+    {
         gameObject.transform.translation += moveSpeed * dt * moveDirection;
     }
 }
 
-void aqua::KeyboardMovementController::moveEncircle(GLFWwindow *window, SurroundingOrbit& orbit,
-                                                    aqua::GameObject &gameObject) {
+void aqua::KeyboardMovementController::moveEncircle(GLFWwindow* window, SurroundingOrbit& orbit,
+                                                    aqua::GameObject& gameObject)
+{
     auto prevMouseX = mouseX;
     auto prevMouseY = mouseY;
 
@@ -50,7 +64,8 @@ void aqua::KeyboardMovementController::moveEncircle(GLFWwindow *window, Surround
     auto deltaMouseX = mouseX - prevMouseX;
     auto deltaMouseY = mouseY - prevMouseY;
 
-    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+    {
         orbit.phi += static_cast<float>(-deltaMouseX) * 0.004f;
         orbit.theta += static_cast<float>(-deltaMouseY) * 0.004f;
     }

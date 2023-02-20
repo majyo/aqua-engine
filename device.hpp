@@ -6,23 +6,28 @@
 #include <string>
 #include <vector>
 
-namespace aqua {
-    struct SwapChainSupportDetails {
+namespace aqua
+{
+    struct SwapChainSupportDetails
+    {
         VkSurfaceCapabilitiesKHR capabilities;
         std::vector<VkSurfaceFormatKHR> formats;
         std::vector<VkPresentModeKHR> presentModes;
     };
 
-    struct QueueFamilyIndices {
+    struct QueueFamilyIndices
+    {
         uint32_t graphicsFamily{};
         uint32_t presentFamily{};
         bool graphicsFamilyHasValue = false;
         bool presentFamilyHasValue = false;
 
-        [[nodiscard]] bool isComplete() const { return graphicsFamilyHasValue && presentFamilyHasValue; }
+        [[nodiscard]] bool isComplete() const
+        { return graphicsFamilyHasValue && presentFamilyHasValue; }
     };
 
-    class AquaDevice {
+    class AquaDevice
+    {
     public:
 #ifdef NDEBUG
         const bool enableValidationLayers = false;
@@ -30,45 +35,71 @@ namespace aqua {
         const bool enableValidationLayers = true;
 #endif
 
-        explicit AquaDevice(AquaWindow &window);
+        explicit AquaDevice(AquaWindow& window);
 
         ~AquaDevice();
 
         // Not copyable or movable
-        AquaDevice(const AquaDevice &) = delete;
+        AquaDevice(const AquaDevice&) = delete;
 
-        void operator=(const AquaDevice &) = delete;
+        void operator=(const AquaDevice&) = delete;
 
-        AquaDevice(AquaDevice &&) = delete;
+        AquaDevice(AquaDevice&&) = delete;
 
-        AquaDevice &operator=(AquaDevice &&) = delete;
+        AquaDevice& operator=(AquaDevice&&) = delete;
 
-        VkCommandPool getCommandPool() { return commandPool; }
+        VkCommandPool getCommandPool()
+        {
+            return _commandPool;
+        }
 
-        VkDevice device() { return device_; }
+        VkDevice device()
+        {
+            return _device;
+        }
 
-        VkSurfaceKHR surface() { return surface_; }
+        VkSurfaceKHR surface()
+        {
+            return _surface;
+        }
 
-        VkQueue graphicsQueue() { return graphicsQueue_; }
+        VkQueue graphicsQueue()
+        {
+            return _graphicsQueue;
+        }
 
-        VkQueue presentQueue() { return presentQueue_; }
+        VkQueue presentQueue()
+        {
+            return _presentQueue;
+        }
 
-        SwapChainSupportDetails getSwapChainSupport() { return querySwapChainSupport(physicalDevice); }
+        VkPhysicalDeviceProperties& properties()
+        {
+            return _properties;
+        }
 
-        uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
+        SwapChainSupportDetails getSwapChainSupport()
+        {
+            return querySwapChainSupport(_physicalDevice);
+        }
 
-        QueueFamilyIndices findPhysicalQueueFamilies() { return findQueueFamilies(physicalDevice); }
+        uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags candidateProperties);
+
+        QueueFamilyIndices findPhysicalQueueFamilies()
+        {
+            return findQueueFamilies(_physicalDevice);
+        }
 
         VkFormat findSupportedFormat(
-                const std::vector<VkFormat> &candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
+                const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
 
         // Buffer Helper Functions
         void createBuffer(
                 VkDeviceSize size,
                 VkBufferUsageFlags usage,
                 VkMemoryPropertyFlags properties,
-                VkBuffer &buffer,
-                VkDeviceMemory &bufferMemory);
+                VkBuffer& buffer,
+                VkDeviceMemory& bufferMemory);
 
         VkCommandBuffer beginSingleTimeCommands();
 
@@ -80,14 +111,13 @@ namespace aqua {
                 VkBuffer buffer, VkImage image, uint32_t width, uint32_t height, uint32_t layerCount);
 
         void createImageWithInfo(
-                const VkImageCreateInfo &imageInfo,
+                const VkImageCreateInfo& imageInfo,
                 VkMemoryPropertyFlags properties,
-                VkImage &image,
-                VkDeviceMemory &imageMemory);
+                VkImage& image,
+                VkDeviceMemory& imageMemory);
 
         void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
 
-        VkPhysicalDeviceProperties properties;
 
     private:
         void createInstance();
@@ -105,13 +135,13 @@ namespace aqua {
         // helper functions
         bool isDeviceSuitable(VkPhysicalDevice device);
 
-        std::vector<const char *> getRequiredExtensions();
+        std::vector<const char*> getRequiredExtensions();
 
         bool checkValidationLayerSupport();
 
         QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
 
-        void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT &createInfo);
+        void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
 
         void hasGlfwRequiredInstanceExtensions();
 
@@ -119,18 +149,20 @@ namespace aqua {
 
         SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
 
-        VkInstance instance;
-        VkDebugUtilsMessengerEXT debugMessenger;
-        VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
-        AquaWindow &window;
-        VkCommandPool commandPool;
+        VkInstance _instance;
+        VkDebugUtilsMessengerEXT _debugMessenger;
+        VkPhysicalDevice _physicalDevice = VK_NULL_HANDLE;
+        AquaWindow& _window;
+        VkCommandPool _commandPool;
 
-        VkDevice device_;
-        VkSurfaceKHR surface_;
-        VkQueue graphicsQueue_;
-        VkQueue presentQueue_;
+        VkDevice _device;
+        VkSurfaceKHR _surface;
+        VkQueue _graphicsQueue;
+        VkQueue _presentQueue;
 
-        const std::vector<const char *> validationLayers = {"VK_LAYER_KHRONOS_validation"};
-        const std::vector<const char *> deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+        VkPhysicalDeviceProperties _properties;
+
+        const std::vector<const char*> validationLayers = {"VK_LAYER_KHRONOS_validation"};
+        const std::vector<const char*> deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
     };
 }

@@ -10,23 +10,29 @@
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
+
 #include <glm/glm.hpp>
 
 #include <memory>
 
-namespace aqua {
-    class Model {
+namespace aqua
+{
+    class Model
+    {
     public:
-        struct Vertex {
+        struct Vertex
+        {
             glm::vec3 position{};
             glm::vec3 color{};
             glm::vec3 normal{};
             glm::vec2 uv{};
 
             static std::vector<VkVertexInputBindingDescription> getBindingDescriptions();
+
             static std::vector<VkVertexInputAttributeDescription> getAttributeDescriptions();
 
-            bool operator==(const Vertex& other) const {
+            bool operator==(const Vertex& other) const
+            {
                 return position == other.position &&
                        color == other.color &&
                        normal == other.normal &&
@@ -34,7 +40,8 @@ namespace aqua {
             }
         };
 
-        struct Builder {
+        struct Builder
+        {
             std::vector<Vertex> vertices{};
             std::vector<uint32_t> indices{};
 
@@ -42,17 +49,24 @@ namespace aqua {
         };
 
         Model(AquaDevice& device, const Builder& builder);
+
         ~Model();
+
         Model(const Model& model) = delete;
+
         Model& operator=(const Model& model) = delete;
 
         void bind(VkCommandBuffer commandBuffer);
+
         void draw(VkCommandBuffer commandBuffer) const;
 
         static std::unique_ptr<Model> createModelFromFile(AquaDevice& device, const std::string& filePath);
+
     private:
-        void createVertexBuffers(const std::vector<Vertex> &vertices);
+        void createVertexBuffers(const std::vector<Vertex>& vertices);
+
         void createIndexBuffers(const std::vector<uint32_t>& indices);
+
     private:
         AquaDevice& device;
 

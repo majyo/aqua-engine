@@ -6,27 +6,33 @@
 
 #include <array>
 
-namespace aqua {
-    Renderer::Renderer(aqua::AquaWindow &window, aqua::AquaDevice &device) : window(window), device(device) {
+namespace aqua
+{
+    Renderer::Renderer(aqua::AquaWindow& window, aqua::AquaDevice& device) : window(window), device(device)
+    {
         recreateSwapChain();
         createCommandBuffers();
     }
 
-    Renderer::~Renderer() {
+    Renderer::~Renderer()
+    {
         freeCommandBuffers();
     }
 
-    VkCommandBuffer Renderer::beginFrame() {
+    VkCommandBuffer Renderer::beginFrame()
+    {
         assert(!isFrameStarted && "Cannot call beginFrame while already in progress");
 
         auto result = swapChain->acquireNextImage(&currentImageIndex);
 
-        if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+        if (result == VK_ERROR_OUT_OF_DATE_KHR)
+        {
             recreateSwapChain();
             return nullptr;
         }
 
-        if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
+        if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
+        {
             throw std::runtime_error("Failed to acquire swap chain image");
         }
 
@@ -36,28 +42,33 @@ namespace aqua {
         VkCommandBufferBeginInfo commandBufferBeginInfo{};
         commandBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
-        if (vkBeginCommandBuffer(commandBuffer, &commandBufferBeginInfo) != VK_SUCCESS) {
+        if (vkBeginCommandBuffer(commandBuffer, &commandBufferBeginInfo) != VK_SUCCESS)
+        {
             throw std::runtime_error("Failed to begin recording command buffer");
         }
 
         return commandBuffer;
     }
 
-    void Renderer::endFrame() {
+    void Renderer::endFrame()
+    {
         assert(isFrameStarted && "Cannot call endFrame while frame is not in progress");
 
         auto commandBuffer = getCurrentCommandBuffer();
 
-        if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
+        if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS)
+        {
             throw std::runtime_error("Failed to close command buffer");
         }
 
         auto result = swapChain->submitCommandBuffers(&commandBuffer, &currentImageIndex);
 
-        if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || window.wasWindowResized()) {
+        if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || window.wasWindowResized())
+        {
             window.resetWindowResizedFlag();
             recreateSwapChain();
-        } else if (result != VK_SUCCESS) {
+        } else if (result != VK_SUCCESS)
+        {
             throw std::runtime_error("Failed to present swap chain image");
         }
 
@@ -65,10 +76,11 @@ namespace aqua {
         currentFrameIndex = (currentFrameIndex + 1) % SwapChain::MAX_FRAMES_IN_FLIGHT;
     }
 
-    void Renderer::beginSwapChainRenderPass(VkCommandBuffer commandBuffer) {
+    void Renderer::beginSwapChainRenderPass(VkCommandBuffer commandBuffer)
+    {
         assert(isFrameStarted && "Cannot call beginSwapChainRenderPass if frame is not in progress");
         assert(commandBuffer == getCurrentCommandBuffer() &&
-        "Cannot begin render pass on command buffer from a different frame");
+               "Cannot begin render pass on command buffer from a different frame");
 
         VkRenderPassBeginInfo renderPassBeginInfo{};
         renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -102,7 +114,8 @@ namespace aqua {
         vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
     }
 
-    void Renderer::endSwapChainRenderPass(VkCommandBuffer commandBuffer) const {
+    void Renderer::endSwapChainRenderPass(VkCommandBuffer commandBuffer) const
+    {
         assert(isFrameStarted && "Cannot call endSwapChainRenderPass if frame is not in progress");
         assert(commandBuffer == getCurrentCommandBuffer() &&
                "Cannot end render pass on command buffer from a different frame");
@@ -110,29 +123,35 @@ namespace aqua {
         vkCmdEndRenderPass(commandBuffer);
     }
 
-    void Renderer::recreateSwapChain() {
+    void Renderer::recreateSwapChain()
+    {
         auto extent = window.getExtent();
 
-        while (extent.width == 0 || extent.height == 0) {
+        while (extent.width == 0 || extent.height == 0)
+        {
             extent = window.getExtent();
             glfwWaitEvents();
         }
 
         vkDeviceWaitIdle(device.device());
 
-        if (swapChain == nullptr) {
+        if (swapChain == nullptr)
+        {
             swapChain = std::make_unique<SwapChain>(device, extent);
-        } else {
+        } else
+        {
             std::shared_ptr<SwapChain> oldSwapChain = std::move(swapChain);
             swapChain = std::make_unique<SwapChain>(device, extent, oldSwapChain);
 
-            if (!oldSwapChain->compareSwapChainFormats(*swapChain)) {
+            if (!oldSwapChain->compareSwapChainFormats(*swapChain))
+            {
                 throw std::runtime_error("Swap chain image format has been changed");
             }
         }
     }
 
-    void Renderer::createCommandBuffers() {
+    void Renderer::createCommandBuffers()
+    {
         commandBuffers.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
         VkCommandBufferAllocateInfo allocateInfo{};
         allocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -140,12 +159,14 @@ namespace aqua {
         allocateInfo.commandPool = device.getCommandPool();
         allocateInfo.commandBufferCount = static_cast<uint32_t>(commandBuffers.size());
 
-        if (vkAllocateCommandBuffers(device.device(), &allocateInfo, commandBuffers.data()) != VK_SUCCESS) {
+        if (vkAllocateCommandBuffers(device.device(), &allocateInfo, commandBuffers.data()) != VK_SUCCESS)
+        {
             throw std::runtime_error("Failed to allocate command buffers");
         }
     }
 
-    void Renderer::freeCommandBuffers() {
+    void Renderer::freeCommandBuffers()
+    {
         vkFreeCommandBuffers(device.device(), device.getCommandPool(), commandBuffers.size(), commandBuffers.data());
         commandBuffers.clear();
     }

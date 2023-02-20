@@ -7,10 +7,13 @@
 #include "game_object.hpp"
 #include "aqua_window.hpp"
 
-namespace aqua {
-    class KeyboardMovementController {
+namespace aqua
+{
+    class KeyboardMovementController
+    {
     public:
-        struct KeyMappings {
+        struct KeyMappings
+        {
             int moveLeft = GLFW_KEY_A;
             int moveRight = GLFW_KEY_D;
             int moveForward = GLFW_KEY_W;
@@ -23,7 +26,8 @@ namespace aqua {
             int lookDown = GLFW_KEY_DOWN;
         };
 
-        struct SurroundingOrbit {
+        struct SurroundingOrbit
+        {
             glm::vec3 focus;
             float radius;
             float theta;
@@ -31,6 +35,7 @@ namespace aqua {
         };
 
         void moveInPlaneXZ(GLFWwindow* window, float dt, GameObject& gameObject);
+
         void moveEncircle(GLFWwindow* window, SurroundingOrbit& orbit, GameObject& gameObject);
 
     public:

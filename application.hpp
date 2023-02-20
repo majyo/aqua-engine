@@ -16,21 +16,28 @@
 #include <vector>
 #include <chrono>
 
-namespace aqua {
-    class Application {
+namespace aqua
+{
+    class Application
+    {
     public:
         static constexpr int WIDTH = 800;
         static constexpr int HEIGHT = 600;
 
     public:
         Application();
+
         ~Application();
+
         Application(const Application& application) = delete;
+
         Application& operator=(const Application& application) = delete;
+
         void run();
 
     private:
         void loadGameObject();
+
         void createTextureImage();
 
     private:

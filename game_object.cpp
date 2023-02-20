@@ -4,8 +4,10 @@
 
 #include "game_object.hpp"
 
-namespace aqua {
-    glm::mat4 TransformComponent::mat() const {
+namespace aqua
+{
+    glm::mat4 TransformComponent::mat() const
+    {
         const float c3 = glm::cos(rotation.z);
         const float s3 = glm::sin(rotation.z);
         const float c2 = glm::cos(rotation.x);
@@ -41,7 +43,8 @@ namespace aqua {
         };
     }
 
-    glm::mat3 TransformComponent::normalMat() const {
+    glm::mat3 TransformComponent::normalMat() const
+    {
         const float c3 = glm::cos(rotation.z);
         const float s3 = glm::sin(rotation.z);
         const float c2 = glm::cos(rotation.x);

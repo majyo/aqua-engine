@@ -11,26 +11,29 @@
 #include <cassert>
 #include <cstring>
 
-namespace aqua {
+namespace aqua
+{
 
 /**
- * Returns the minimum instance size required to be compatible with devices minOffsetAlignment
+ * Returns the minimum _instance size required to be compatible with devices minOffsetAlignment
  *
- * @param instanceSize The size of an instance
+ * @param instanceSize The size of an _instance
  * @param minOffsetAlignment The minimum required alignment, in bytes, for the offset member (eg
  * minUniformBufferOffsetAlignment)
  *
  * @return VkResult of the buffer mapping call
  */
-    VkDeviceSize Buffer::getAlignment(VkDeviceSize instanceSize, VkDeviceSize minOffsetAlignment) {
-        if (minOffsetAlignment > 0) {
+    VkDeviceSize Buffer::getAlignment(VkDeviceSize instanceSize, VkDeviceSize minOffsetAlignment)
+    {
+        if (minOffsetAlignment > 0)
+        {
             return (instanceSize + minOffsetAlignment - 1) & ~(minOffsetAlignment - 1);
         }
         return instanceSize;
     }
 
     Buffer::Buffer(
-            AquaDevice &device,
+            AquaDevice& device,
             VkDeviceSize instanceSize,
             uint32_t instanceCount,
             VkBufferUsageFlags usageFlags,
@@ -40,13 +43,15 @@ namespace aqua {
               instanceSize{instanceSize},
               instanceCount{instanceCount},
               usageFlags{usageFlags},
-              memoryPropertyFlags{memoryPropertyFlags} {
+              memoryPropertyFlags{memoryPropertyFlags}
+    {
         alignmentSize = getAlignment(instanceSize, minOffsetAlignment);
         bufferSize = alignmentSize * instanceCount;
         device.createBuffer(bufferSize, usageFlags, memoryPropertyFlags, buffer, memory);
     }
 
-    Buffer::~Buffer() {
+    Buffer::~Buffer()
+    {
         unmap();
         vkDestroyBuffer(device.device(), buffer, nullptr);
         vkFreeMemory(device.device(), memory, nullptr);
@@ -61,7 +66,8 @@ namespace aqua {
  *
  * @return VkResult of the buffer mapping call
  */
-    VkResult Buffer::map(VkDeviceSize size, VkDeviceSize offset) {
+    VkResult Buffer::map(VkDeviceSize size, VkDeviceSize offset)
+    {
         assert(buffer && memory && "Called map on buffer before create");
         return vkMapMemory(device.device(), memory, offset, size, 0, &mapped);
     }
@@ -71,8 +77,10 @@ namespace aqua {
  *
  * @note Does not return a result as vkUnmapMemory can't fail
  */
-    void Buffer::unmap() {
-        if (mapped) {
+    void Buffer::unmap()
+    {
+        if (mapped)
+        {
             vkUnmapMemory(device.device(), memory);
             mapped = nullptr;
         }
@@ -87,13 +95,16 @@ namespace aqua {
  * @param offset (Optional) Byte offset from beginning of mapped region
  *
  */
-    void Buffer::writeToBuffer(void *data, VkDeviceSize size, VkDeviceSize offset) {
+    void Buffer::writeToBuffer(void* data, VkDeviceSize size, VkDeviceSize offset)
+    {
         assert(mapped && "Cannot copy to unmapped buffer");
 
-        if (size == VK_WHOLE_SIZE) {
+        if (size == VK_WHOLE_SIZE)
+        {
             memcpy(mapped, data, bufferSize);
-        } else {
-            char *memOffset = (char *)mapped;
+        } else
+        {
+            char* memOffset = (char*) mapped;
             memOffset += offset;
             memcpy(memOffset, data, size);
         }
@@ -110,7 +121,8 @@ namespace aqua {
  *
  * @return VkResult of the flush call
  */
-    VkResult Buffer::flush(VkDeviceSize size, VkDeviceSize offset) {
+    VkResult Buffer::flush(VkDeviceSize size, VkDeviceSize offset)
+    {
         VkMappedMemoryRange mappedRange = {};
         mappedRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
         mappedRange.memory = memory;
@@ -130,7 +142,8 @@ namespace aqua {
  *
  * @return VkResult of the invalidate call
  */
-    VkResult Buffer::invalidate(VkDeviceSize size, VkDeviceSize offset) {
+    VkResult Buffer::invalidate(VkDeviceSize size, VkDeviceSize offset)
+    {
         VkMappedMemoryRange mappedRange = {};
         mappedRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
         mappedRange.memory = memory;
@@ -147,7 +160,8 @@ namespace aqua {
  *
  * @return VkDescriptorBufferInfo of specified offset and range
  */
-    VkDescriptorBufferInfo Buffer::descriptorInfo(VkDeviceSize size, VkDeviceSize offset) {
+    VkDescriptorBufferInfo Buffer::descriptorInfo(VkDeviceSize size, VkDeviceSize offset)
+    {
         return VkDescriptorBufferInfo{
                 buffer,
                 offset,
@@ -162,7 +176,8 @@ namespace aqua {
  * @param index Used in offset calculation
  *
  */
-    void Buffer::writeToIndex(void *data, int index) {
+    void Buffer::writeToIndex(void* data, int index)
+    {
         writeToBuffer(data, instanceSize, index * alignmentSize);
     }
 
@@ -172,16 +187,18 @@ namespace aqua {
  * @param index Used in offset calculation
  *
  */
-    VkResult Buffer::flushIndex(int index) { return flush(alignmentSize, index * alignmentSize); }
+    VkResult Buffer::flushIndex(int index)
+    { return flush(alignmentSize, index * alignmentSize); }
 
 /**
  * Create a buffer info descriptor
  *
  * @param index Specifies the region given by index * alignmentSize
  *
- * @return VkDescriptorBufferInfo for instance at index
+ * @return VkDescriptorBufferInfo for _instance at index
  */
-    VkDescriptorBufferInfo Buffer::descriptorInfoForIndex(int index) {
+    VkDescriptorBufferInfo Buffer::descriptorInfoForIndex(int index)
+    {
         return descriptorInfo(alignmentSize, index * alignmentSize);
     }
 
@@ -194,7 +211,8 @@ namespace aqua {
  *
  * @return VkResult of the invalidate call
  */
-    VkResult Buffer::invalidateIndex(int index) {
+    VkResult Buffer::invalidateIndex(int index)
+    {
         return invalidate(alignmentSize, index * alignmentSize);
     }
 

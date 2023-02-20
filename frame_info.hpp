@@ -8,12 +8,14 @@
 
 #include <vulkan/vulkan.h>
 
-namespace aqua {
-    struct FrameInfo {
+namespace aqua
+{
+    struct FrameInfo
+    {
         int frameIndex;
         float frameTime;
         VkCommandBuffer commandBuffer;
-        Camera &camera;
+        Camera& camera;
         VkDescriptorSet globalDescriptorSet;
     };
 }
