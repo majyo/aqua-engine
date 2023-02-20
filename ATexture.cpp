@@ -11,9 +11,9 @@ namespace aqua
 {
     ATexture::ATexture(AquaDevice& aquaDevice, const char* fileName) : _aquaDevice(aquaDevice)
     {
-        createTextureImage(fileName);
-        createTextureImageView();
-        createTextureSampler();
+        CreateTextureImage(fileName);
+        CreateTextureImageView();
+        CreateTextureSampler();
     }
 
     ATexture::~ATexture()
@@ -24,7 +24,7 @@ namespace aqua
         vkFreeMemory(_aquaDevice.device(), _textureImageMemory, nullptr);
     }
 
-    void ATexture::createTextureImage(const char* fileName)
+    void ATexture::CreateTextureImage(const char* fileName)
     {
         // Read image data using stb_image
         int texWidth, texHeight, texChannel;
@@ -77,7 +77,7 @@ namespace aqua
                                           VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     }
 
-    void ATexture::createTextureImageView()
+    void ATexture::CreateTextureImageView()
     {
         VkImageViewCreateInfo imageViewCreateInfo{};
         imageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -93,7 +93,7 @@ namespace aqua
         VK_CHECK(vkCreateImageView(_aquaDevice.device(), &imageViewCreateInfo, nullptr, &_textureImageView))
     }
 
-    void ATexture::createTextureSampler()
+    void ATexture::CreateTextureSampler()
     {
         VkSamplerCreateInfo samplerCreateInfo{};
         samplerCreateInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;

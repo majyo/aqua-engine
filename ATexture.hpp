@@ -14,22 +14,25 @@ namespace aqua
     {
     public:
         explicit ATexture(AquaDevice& aquaDevice, const char* fileName);
+        ATexture(const ATexture& aTexture) = delete;
         ~ATexture();
+        ATexture& operator=(const ATexture& aTexture) = delete;
 
-        [[nodiscard]] VkImageView textureImageView()
+        [[nodiscard]] VkImageView TextureImageView()
         {
             return _textureImageView;
         }
 
-        [[nodiscard]] VkSampler textureSampler()
+        [[nodiscard]] VkSampler TextureSampler()
         {
             return _textureSampler;
         }
 
     private:
-        void createTextureImage(const char* fileName);
-        void createTextureImageView();
-        void createTextureSampler();
+        void CreateTextureImage(const char* fileName);
+        void CreateTextureImageView();
+        void CreateTextureSampler();
+
     private:
         AquaDevice& _aquaDevice;
         VkImage _textureImage = VK_NULL_HANDLE;
