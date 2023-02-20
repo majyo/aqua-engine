@@ -14,6 +14,18 @@ namespace aqua
     {
     public:
         explicit ATexture(AquaDevice& aquaDevice, const char* fileName);
+        ~ATexture();
+
+        [[nodiscard]] VkImageView textureImageView()
+        {
+            return _textureImageView;
+        }
+
+        [[nodiscard]] VkSampler textureSampler()
+        {
+            return _textureSampler;
+        }
+
     private:
         void createTextureImage(const char* fileName);
         void createTextureImageView();

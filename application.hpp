@@ -36,21 +36,11 @@ namespace aqua
     private:
         void loadGameObject();
 
-        void createTextureImage();
-        void createTextureImageView();
-        void createTextureSampler();
-
     private:
         AquaWindow _aquaWindow{WIDTH, HEIGHT, "Vulkan Demo"};
         AquaDevice _aquaDevice{_aquaWindow};
         Renderer _renderer{_aquaWindow, _aquaDevice};
         std::unique_ptr<DescriptorPool> _globalDescriptorPool{};
         std::vector<GameObject> _gameObjects;
-
-        // Temp
-        VkImage _textureImage;
-        VkDeviceMemory _textureImageMemory;
-        VkImageView _textureImageView;
-        VkSampler _textureSampler;
     };
 }

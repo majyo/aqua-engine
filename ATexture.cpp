@@ -16,6 +16,14 @@ namespace aqua
         createTextureSampler();
     }
 
+    ATexture::~ATexture()
+    {
+        vkDestroySampler(_aquaDevice.device(), _textureSampler, nullptr);
+        vkDestroyImageView(_aquaDevice.device(), _textureImageView, nullptr);
+        vkDestroyImage(_aquaDevice.device(), _textureImage, nullptr);
+        vkFreeMemory(_aquaDevice.device(), _textureImageMemory, nullptr);
+    }
+
     void ATexture::createTextureImage(const char* fileName)
     {
         // Read image data using stb_image
