@@ -57,8 +57,8 @@ namespace aqua
         pipelineConfigInfo.pipelineLayout = pipelineLayout;
         pipeline = std::make_unique<Pipeline>(
                 device,
-                "../shaders/simple_shader.vert.spv",
-                "../shaders/simple_shader.frag.spv",
+                "../Resources/shaders/simple_shader.vert.spv",
+                "../Resources/shaders/simple_shader.frag.spv",
                 pipelineConfigInfo);
     }
 

@@ -143,7 +143,7 @@ namespace aqua
         }
 
         vkGetPhysicalDeviceProperties(_physicalDevice, &_properties);
-        std::cout << "physical _aquaDevice: " << _properties.deviceName << std::endl;
+        std::cout << "physical _aDevice: " << _properties.deviceName << std::endl;
     }
 
     void ADevice::createLogicalDevice()
@@ -177,7 +177,7 @@ namespace aqua
         createInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
         createInfo.ppEnabledExtensionNames = deviceExtensions.data();
 
-        // might not really be necessary anymore because _aquaDevice specific validation layers
+        // might not really be necessary anymore because _aDevice specific validation layers
         // have been deprecated
         if (enableValidationLayers)
         {
@@ -190,7 +190,7 @@ namespace aqua
 
         if (vkCreateDevice(_physicalDevice, &createInfo, nullptr, &_device) != VK_SUCCESS)
         {
-            throw std::runtime_error("failed to create logical _aquaDevice!");
+            throw std::runtime_error("failed to create logical _aDevice!");
         }
 
         vkGetDeviceQueue(_device, indices.graphicsFamily, 0, &_graphicsQueue);

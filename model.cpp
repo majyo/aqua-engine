@@ -33,12 +33,12 @@ namespace aqua
 
     Model::~Model()
     {
-//        vkDestroyBuffer(_aquaDevice._aquaDevice(), vertexBuffer, nullptr);
-//        vkFreeMemory(_aquaDevice._aquaDevice(), vertexBufferMemory, nullptr);
+//        vkDestroyBuffer(_aDevice._aDevice(), vertexBuffer, nullptr);
+//        vkFreeMemory(_aDevice._aDevice(), vertexBufferMemory, nullptr);
 
 //        if (hasIndexBuffer) {
-//            vkDestroyBuffer(_aquaDevice._aquaDevice(), indexBuffer, nullptr);
-//            vkFreeMemory(_aquaDevice._aquaDevice(), indexBufferMemory, nullptr);
+//            vkDestroyBuffer(_aDevice._aDevice(), indexBuffer, nullptr);
+//            vkFreeMemory(_aDevice._aDevice(), indexBufferMemory, nullptr);
 //        }
     }
 

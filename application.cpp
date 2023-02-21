@@ -5,7 +5,7 @@
 #include "application.hpp"
 
 #include "keyboard_movement.hpp"
-#include "ATexture.hpp"
+#include "Textures/ATexture.hpp"
 
 namespace aqua
 {
@@ -33,7 +33,8 @@ namespace aqua
 
     void Application::run()
     {
-        ATexture texture(_aquaDevice, "../models/box/box_albedo.png");
+        ATexture::Builder textureBuilder(_aquaDevice);
+        std::unique_ptr<ATexture> texture = textureBuilder.BuildFromFile("../Resources/models/box/box_albedo.png");
 
         std::vector<std::unique_ptr<Buffer>> uboBuffers(SwapChain::MAX_FRAMES_IN_FLIGHT);
         for (auto& uboBuffer: uboBuffers)
@@ -60,8 +61,8 @@ namespace aqua
 
             VkDescriptorImageInfo imageInfo{};
             imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-            imageInfo.imageView = texture.TextureImageView();
-            imageInfo.sampler = texture.TextureSampler();
+            imageInfo.imageView = texture->TextureImageView();
+            imageInfo.sampler = texture->TextureSampler();
 
             DescriptorWriter(*globalSetLayout, *_globalDescriptorPool)
                     .writeBuffer(0, &bufferInfo)
@@ -130,7 +131,7 @@ namespace aqua
 
     void Application::loadGameObject()
     {
-        std::shared_ptr<Model> model = Model::createModelFromFile(_aquaDevice, "../models/box/box.obj");
+        std::shared_ptr<Model> model = Model::createModelFromFile(_aquaDevice, "../Resources/models/box/box.obj");
         auto gameObject = GameObject::createGameObject();
         gameObject.model = model;
 //        gameObject.transform.scale = {1.0f, 1.0f, 1.0f};

@@ -107,7 +107,7 @@ namespace aqua
     }
 
 /**
- * Flush a memory range of the buffer to make it visible to the _aquaDevice
+ * Flush a memory range of the buffer to make it visible to the _aDevice
  *
  * @note Only required for non-coherent memory
  *
@@ -178,7 +178,7 @@ namespace aqua
     }
 
 /**
- *  Flush the memory range at index * alignmentSize of the buffer to make it visible to the _aquaDevice
+ *  Flush the memory range at index * alignmentSize of the buffer to make it visible to the _aDevice
  *
  * @param index Used in offset calculation
  *
