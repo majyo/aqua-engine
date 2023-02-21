@@ -9,7 +9,7 @@
 
 namespace aqua
 {
-    ATexture::ATexture(AquaDevice& aquaDevice, const char* fileName) : _aquaDevice(aquaDevice)
+    ATexture::ATexture(ADevice& aquaDevice, const char* fileName) : _aquaDevice(aquaDevice)
     {
         CreateTextureImage(fileName);
         CreateTextureImageView();
@@ -26,6 +26,8 @@ namespace aqua
 
     void ATexture::CreateTextureImage(const char* fileName)
     {
+        stbi_set_flip_vertically_on_load(true);
+
         // Read image data using stb_image
         int texWidth, texHeight, texChannel;
         stbi_uc* pixels = stbi_load(fileName, &texWidth, &texHeight, &texChannel, STBI_rgb_alpha);

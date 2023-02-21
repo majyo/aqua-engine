@@ -6,7 +6,7 @@
 
 namespace aqua
 {
-    Renderer::Renderer(aqua::AquaWindow& window, aqua::AquaDevice& device) : window(window), device(device)
+    Renderer::Renderer(aqua::AquaWindow& window, aqua::ADevice& device) : window(window), device(device)
     {
         recreateSwapChain();
         createCommandBuffers();

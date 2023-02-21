@@ -12,7 +12,7 @@ struct SimplePushConstantData
 
 namespace aqua
 {
-    SimpleRenderSystem::SimpleRenderSystem(aqua::AquaDevice& device, VkRenderPass renderPass,
+    SimpleRenderSystem::SimpleRenderSystem(aqua::ADevice& device, VkRenderPass renderPass,
                                            VkDescriptorSetLayout globalDescriptorSetLayout) : device(device)
     {
         createPipelineLayout(globalDescriptorSetLayout);

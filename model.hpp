@@ -6,7 +6,7 @@
 
 #include "Defines.hpp"
 
-#include "device.hpp"
+#include "ADevice.hpp"
 #include "buffer.hpp"
 
 namespace aqua
@@ -42,7 +42,7 @@ namespace aqua
             void loadModel(const std::string& filename);
         };
 
-        Model(AquaDevice& device, const Builder& builder);
+        Model(ADevice& device, const Builder& builder);
 
         ~Model();
 
@@ -54,7 +54,7 @@ namespace aqua
 
         void draw(VkCommandBuffer commandBuffer) const;
 
-        static std::unique_ptr<Model> createModelFromFile(AquaDevice& device, const std::string& filePath);
+        static std::unique_ptr<Model> createModelFromFile(ADevice& device, const std::string& filePath);
 
     private:
         void createVertexBuffers(const std::vector<Vertex>& vertices);
@@ -62,7 +62,7 @@ namespace aqua
         void createIndexBuffers(const std::vector<uint32_t>& indices);
 
     private:
-        AquaDevice& device;
+        ADevice& device;
 
         std::unique_ptr<Buffer> vertexBuffer;
         uint32_t vertexCount{};

@@ -2,7 +2,7 @@
 
 #include "Defines.hpp"
 
-#include "device.hpp"
+#include "ADevice.hpp"
 
 namespace aqua
 {
@@ -12,9 +12,9 @@ namespace aqua
     public:
         static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
-        SwapChain(AquaDevice& deviceRef, VkExtent2D windowExtent);
+        SwapChain(ADevice& deviceRef, VkExtent2D windowExtent);
 
-        SwapChain(AquaDevice& deviceRef, VkExtent2D windowExtent, std::shared_ptr<SwapChain> previousSwapChain);
+        SwapChain(ADevice& deviceRef, VkExtent2D windowExtent, std::shared_ptr<SwapChain> previousSwapChain);
 
         ~SwapChain();
 
@@ -100,7 +100,7 @@ namespace aqua
         std::vector<VkImage> swapChainImages;
         std::vector<VkImageView> swapChainImageViews;
 
-        AquaDevice& device;
+        ADevice& device;
         VkExtent2D windowExtent;
 
         VkSwapchainKHR swapChain;

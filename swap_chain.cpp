@@ -2,13 +2,13 @@
 
 namespace aqua
 {
-    SwapChain::SwapChain(AquaDevice& deviceRef, VkExtent2D extent)
+    SwapChain::SwapChain(ADevice& deviceRef, VkExtent2D extent)
             : device{deviceRef}, windowExtent{extent}
     {
         init();
     }
 
-    SwapChain::SwapChain(AquaDevice& deviceRef, VkExtent2D windowExtent, std::shared_ptr<SwapChain> previousSwapChain)
+    SwapChain::SwapChain(ADevice& deviceRef, VkExtent2D windowExtent, std::shared_ptr<SwapChain> previousSwapChain)
             : device(deviceRef), windowExtent(windowExtent), previousSwapChain(std::move(previousSwapChain))
     {
         init();

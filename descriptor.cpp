@@ -29,7 +29,7 @@ namespace aqua
 // *************** Descriptor Set Layout *********************
 
     DescriptorSetLayout::DescriptorSetLayout(
-            AquaDevice& device, std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings)
+            ADevice& device, std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings)
             : device{device}, bindings{bindings}
     {
         std::vector<VkDescriptorSetLayoutBinding> setLayoutBindings{};
@@ -88,7 +88,7 @@ namespace aqua
 // *************** Descriptor Pool *********************
 
     DescriptorPool::DescriptorPool(
-            AquaDevice& device,
+            ADevice& device,
             uint32_t maxSets,
             VkDescriptorPoolCreateFlags poolFlags,
             const std::vector<VkDescriptorPoolSize>& poolSizes)

@@ -24,7 +24,7 @@ namespace aqua
         { return graphicsFamilyHasValue && presentFamilyHasValue; }
     };
 
-    class AquaDevice
+    class ADevice
     {
     public:
 #ifdef NDEBUG
@@ -33,18 +33,18 @@ namespace aqua
         const bool enableValidationLayers = true;
 #endif
 
-        explicit AquaDevice(AquaWindow& window);
+        explicit ADevice(AquaWindow& window);
 
-        ~AquaDevice();
+        ~ADevice();
 
         // Not copyable or movable
-        AquaDevice(const AquaDevice&) = delete;
+        ADevice(const ADevice&) = delete;
 
-        void operator=(const AquaDevice&) = delete;
+        void operator=(const ADevice&) = delete;
 
-        AquaDevice(AquaDevice&&) = delete;
+        ADevice(ADevice&&) = delete;
 
-        AquaDevice& operator=(AquaDevice&&) = delete;
+        ADevice& operator=(ADevice&&) = delete;
 
         VkCommandPool getCommandPool()
         {

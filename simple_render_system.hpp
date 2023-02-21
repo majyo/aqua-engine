@@ -7,7 +7,7 @@
 #include "Defines.hpp"
 
 #include "pipeline.hpp"
-#include "device.hpp"
+#include "ADevice.hpp"
 #include "game_object.hpp"
 #include "camera.hpp"
 #include "frame_info.hpp"
@@ -17,7 +17,7 @@ namespace aqua
     class SimpleRenderSystem
     {
     public:
-        SimpleRenderSystem(AquaDevice& device, VkRenderPass renderPass,
+        SimpleRenderSystem(ADevice& device, VkRenderPass renderPass,
                            VkDescriptorSetLayout globalDescriptorSetLayout);
 
         ~SimpleRenderSystem();
@@ -34,7 +34,7 @@ namespace aqua
         void createPipeline(VkRenderPass renderPass);
 
     private:
-        AquaDevice& device;
+        ADevice& device;
         std::unique_ptr<Pipeline> pipeline;
         VkPipelineLayout pipelineLayout{};
     };

@@ -6,7 +6,7 @@
 
 #include "Defines.hpp"
 
-#include "device.hpp"
+#include "ADevice.hpp"
 #include "model.hpp"
 
 namespace aqua
@@ -38,7 +38,7 @@ namespace aqua
     class Pipeline
     {
     public:
-        Pipeline(AquaDevice& device, const std::string& vertShaderPath, const std::string& fragShaderPath,
+        Pipeline(ADevice& device, const std::string& vertShaderPath, const std::string& fragShaderPath,
                  const PipelineConfigInfo& configInfo);
 
         ~Pipeline();
@@ -61,7 +61,7 @@ namespace aqua
         void createShaderModule(const std::vector<char>& code, VkShaderModule* shaderModule);
 
     private:
-        AquaDevice& device;
+        ADevice& device;
         VkPipeline graphicsPipeline{};
         VkShaderModule vertShaderModule{};
         VkShaderModule fragShaderModule{};

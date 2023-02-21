@@ -7,7 +7,7 @@
 #include "Defines.hpp"
 
 #include "aqua_window.hpp"
-#include "device.hpp"
+#include "ADevice.hpp"
 #include "swap_chain.hpp"
 #include "model.hpp"
 
@@ -16,7 +16,7 @@ namespace aqua
     class Renderer
     {
     public:
-        Renderer(AquaWindow& window, AquaDevice& device);
+        Renderer(AquaWindow& window, ADevice& device);
 
         ~Renderer();
 
@@ -68,7 +68,7 @@ namespace aqua
 
     private:
         AquaWindow& window;
-        AquaDevice& device;
+        ADevice& device;
         std::unique_ptr<SwapChain> swapChain;
         std::vector<VkCommandBuffer> commandBuffers;
         int currentFrameIndex{0};

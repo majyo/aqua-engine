@@ -6,7 +6,7 @@
 
 namespace aqua
 {
-    Pipeline::Pipeline(AquaDevice& device, const std::string& vertShaderPath, const std::string& fragShaderPath,
+    Pipeline::Pipeline(ADevice& device, const std::string& vertShaderPath, const std::string& fragShaderPath,
                        const PipelineConfigInfo& configInfo) : device(device)
     {
         char buffer[256];

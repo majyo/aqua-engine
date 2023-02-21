@@ -25,7 +25,7 @@ namespace std
 
 namespace aqua
 {
-    Model::Model(AquaDevice& device, const Builder& builder) : device(device)
+    Model::Model(ADevice& device, const Builder& builder) : device(device)
     {
         createVertexBuffers(builder.vertices);
         createIndexBuffers(builder.indices);
@@ -66,7 +66,7 @@ namespace aqua
         vkCmdDraw(commandBuffer, vertexCount, 1, 0, 0);
     }
 
-    std::unique_ptr<Model> Model::createModelFromFile(AquaDevice& device, const std::string& filePath)
+    std::unique_ptr<Model> Model::createModelFromFile(ADevice& device, const std::string& filePath)
     {
         Builder builder{};
         builder.loadModel(filePath);

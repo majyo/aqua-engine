@@ -2,7 +2,7 @@
 
 #include "Defines.hpp"
 
-#include "device.hpp"
+#include "ADevice.hpp"
 
 namespace aqua
 {
@@ -12,7 +12,7 @@ namespace aqua
         class Builder
         {
         public:
-            explicit Builder(AquaDevice& device) : device{device}
+            explicit Builder(ADevice& device) : device{device}
             {}
 
             Builder& addBinding(
@@ -24,12 +24,12 @@ namespace aqua
             std::unique_ptr<DescriptorSetLayout> build() const;
 
         private:
-            AquaDevice& device;
+            ADevice& device;
             std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings{};
         };
 
         DescriptorSetLayout(
-                AquaDevice& device, std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings);
+                ADevice& device, std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings);
 
         ~DescriptorSetLayout();
 
@@ -41,7 +41,7 @@ namespace aqua
         { return descriptorSetLayout; }
 
     private:
-        AquaDevice& device;
+        ADevice& device;
         VkDescriptorSetLayout descriptorSetLayout;
         std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings;
 
@@ -54,7 +54,7 @@ namespace aqua
         class Builder
         {
         public:
-            Builder(AquaDevice& device) : device{device}
+            Builder(ADevice& device) : device{device}
             {}
 
             Builder& addPoolSize(VkDescriptorType descriptorType, uint32_t count);
@@ -66,14 +66,14 @@ namespace aqua
             [[nodiscard]] std::unique_ptr<DescriptorPool> build() const;
 
         private:
-            AquaDevice& device;
+            ADevice& device;
             std::vector<VkDescriptorPoolSize> poolSizes{};
             uint32_t maxSets = 1000;
             VkDescriptorPoolCreateFlags poolFlags = 0;
         };
 
         DescriptorPool(
-                AquaDevice& device,
+                ADevice& device,
                 uint32_t maxSets,
                 VkDescriptorPoolCreateFlags poolFlags,
                 const std::vector<VkDescriptorPoolSize>& poolSizes);
@@ -91,7 +91,7 @@ namespace aqua
         void resetPool();
 
     private:
-        AquaDevice& device;
+        ADevice& device;
         VkDescriptorPool descriptorPool;
 
         friend class DescriptorWriter;

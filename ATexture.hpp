@@ -5,7 +5,7 @@
 #pragma once
 
 #include "Defines.hpp"
-#include "device.hpp"
+#include "ADevice.hpp"
 #include "buffer.hpp"
 
 namespace aqua
@@ -13,7 +13,7 @@ namespace aqua
     class ATexture
     {
     public:
-        explicit ATexture(AquaDevice& aquaDevice, const char* fileName);
+        explicit ATexture(ADevice& aquaDevice, const char* fileName);
         ATexture(const ATexture& aTexture) = delete;
         ~ATexture();
         ATexture& operator=(const ATexture& aTexture) = delete;
@@ -34,7 +34,7 @@ namespace aqua
         void CreateTextureSampler();
 
     private:
-        AquaDevice& _aquaDevice;
+        ADevice& _aquaDevice;
         VkImage _textureImage = VK_NULL_HANDLE;
         VkDeviceMemory _textureImageMemory = VK_NULL_HANDLE;
         VkImageView _textureImageView = VK_NULL_HANDLE;

@@ -8,7 +8,7 @@
 
 #include "camera.hpp"
 #include "aqua_window.hpp"
-#include "device.hpp"
+#include "ADevice.hpp"
 #include "renderer.hpp"
 #include "game_object.hpp"
 #include "simple_render_system.hpp"
@@ -38,7 +38,7 @@ namespace aqua
 
     private:
         AquaWindow _aquaWindow{WIDTH, HEIGHT, "Vulkan Demo"};
-        AquaDevice _aquaDevice{_aquaWindow};
+        ADevice _aquaDevice{_aquaWindow};
         Renderer _renderer{_aquaWindow, _aquaDevice};
         std::unique_ptr<DescriptorPool> _globalDescriptorPool{};
         std::vector<GameObject> _gameObjects;

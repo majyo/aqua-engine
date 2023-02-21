@@ -1,4 +1,4 @@
-#include "device.hpp"
+#include "ADevice.hpp"
 
 namespace aqua
 {
@@ -47,7 +47,7 @@ namespace aqua
     }
 
 // class member functions
-    AquaDevice::AquaDevice(AquaWindow& window) : _window{window}
+    ADevice::ADevice(AquaWindow& window) : _window{window}
     {
         createInstance();
         setupDebugMessenger();
@@ -57,7 +57,7 @@ namespace aqua
         createCommandPool();
     }
 
-    AquaDevice::~AquaDevice()
+    ADevice::~ADevice()
     {
         vkDestroyCommandPool(_device, _commandPool, nullptr);
         vkDestroyDevice(_device, nullptr);
@@ -71,7 +71,7 @@ namespace aqua
         vkDestroyInstance(_instance, nullptr);
     }
 
-    void AquaDevice::createInstance()
+    void ADevice::createInstance()
     {
         if (enableValidationLayers && !checkValidationLayerSupport())
         {
@@ -116,7 +116,7 @@ namespace aqua
         hasGlfwRequiredInstanceExtensions();
     }
 
-    void AquaDevice::pickPhysicalDevice()
+    void ADevice::pickPhysicalDevice()
     {
         uint32_t deviceCount = 0;
         vkEnumeratePhysicalDevices(_instance, &deviceCount, nullptr);
@@ -146,7 +146,7 @@ namespace aqua
         std::cout << "physical _aquaDevice: " << _properties.deviceName << std::endl;
     }
 
-    void AquaDevice::createLogicalDevice()
+    void ADevice::createLogicalDevice()
     {
         QueueFamilyIndices indices = findQueueFamilies(_physicalDevice);
 
@@ -197,7 +197,7 @@ namespace aqua
         vkGetDeviceQueue(_device, indices.presentFamily, 0, &_presentQueue);
     }
 
-    void AquaDevice::createCommandPool()
+    void ADevice::createCommandPool()
     {
         QueueFamilyIndices queueFamilyIndices = findPhysicalQueueFamilies();
 
@@ -213,10 +213,10 @@ namespace aqua
         }
     }
 
-    void AquaDevice::createSurface()
+    void ADevice::createSurface()
     { _window.createWindowSurface(_instance, &_surface); }
 
-    bool AquaDevice::isDeviceSuitable(VkPhysicalDevice device)
+    bool ADevice::isDeviceSuitable(VkPhysicalDevice device)
     {
         QueueFamilyIndices indices = findQueueFamilies(device);
 
@@ -236,7 +236,7 @@ namespace aqua
                supportedFeatures.samplerAnisotropy;
     }
 
-    void AquaDevice::populateDebugMessengerCreateInfo(
+    void ADevice::populateDebugMessengerCreateInfo(
             VkDebugUtilsMessengerCreateInfoEXT& createInfo)
     {
         createInfo = {};
@@ -250,7 +250,7 @@ namespace aqua
         createInfo.pUserData = nullptr;  // Optional
     }
 
-    void AquaDevice::setupDebugMessenger()
+    void ADevice::setupDebugMessenger()
     {
         if (!enableValidationLayers) return;
         VkDebugUtilsMessengerCreateInfoEXT createInfo;
@@ -261,7 +261,7 @@ namespace aqua
         }
     }
 
-    bool AquaDevice::checkValidationLayerSupport()
+    bool ADevice::checkValidationLayerSupport()
     {
         uint32_t layerCount;
         vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
@@ -291,7 +291,7 @@ namespace aqua
         return true;
     }
 
-    std::vector<const char*> AquaDevice::getRequiredExtensions()
+    std::vector<const char*> ADevice::getRequiredExtensions()
     {
         uint32_t glfwExtensionCount = 0;
         const char** glfwExtensions;
@@ -307,7 +307,7 @@ namespace aqua
         return extensions;
     }
 
-    void AquaDevice::hasGlfwRequiredInstanceExtensions()
+    void ADevice::hasGlfwRequiredInstanceExtensions()
     {
         uint32_t extensionCount = 0;
         vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
@@ -334,7 +334,7 @@ namespace aqua
         }
     }
 
-    bool AquaDevice::checkDeviceExtensionSupport(VkPhysicalDevice device)
+    bool ADevice::checkDeviceExtensionSupport(VkPhysicalDevice device)
     {
         uint32_t extensionCount;
         vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
@@ -356,7 +356,7 @@ namespace aqua
         return requiredExtensions.empty();
     }
 
-    QueueFamilyIndices AquaDevice::findQueueFamilies(VkPhysicalDevice device)
+    QueueFamilyIndices ADevice::findQueueFamilies(VkPhysicalDevice device)
     {
         QueueFamilyIndices indices;
 
@@ -392,7 +392,7 @@ namespace aqua
         return indices;
     }
 
-    SwapChainSupportDetails AquaDevice::querySwapChainSupport(VkPhysicalDevice device)
+    SwapChainSupportDetails ADevice::querySwapChainSupport(VkPhysicalDevice device)
     {
         SwapChainSupportDetails details;
         vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, _surface, &details.capabilities);
@@ -421,7 +421,7 @@ namespace aqua
         return details;
     }
 
-    VkFormat AquaDevice::findSupportedFormat(
+    VkFormat ADevice::findSupportedFormat(
             const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features)
     {
         for (VkFormat format: candidates)
@@ -441,7 +441,7 @@ namespace aqua
         throw std::runtime_error("failed to find supported format!");
     }
 
-    uint32_t AquaDevice::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags candidateProperties)
+    uint32_t ADevice::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags candidateProperties)
     {
         VkPhysicalDeviceMemoryProperties memProperties;
         vkGetPhysicalDeviceMemoryProperties(_physicalDevice, &memProperties);
@@ -457,7 +457,7 @@ namespace aqua
         throw std::runtime_error("failed to find suitable memory type!");
     }
 
-    void AquaDevice::createBuffer(
+    void ADevice::createBuffer(
             VkDeviceSize size,
             VkBufferUsageFlags usage,
             VkMemoryPropertyFlags properties,
@@ -491,7 +491,7 @@ namespace aqua
         vkBindBufferMemory(_device, buffer, bufferMemory, 0);
     }
 
-    VkCommandBuffer AquaDevice::beginSingleTimeCommands()
+    VkCommandBuffer ADevice::beginSingleTimeCommands()
     {
         VkCommandBufferAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -510,7 +510,7 @@ namespace aqua
         return commandBuffer;
     }
 
-    void AquaDevice::endSingleTimeCommands(VkCommandBuffer commandBuffer)
+    void ADevice::endSingleTimeCommands(VkCommandBuffer commandBuffer)
     {
         vkEndCommandBuffer(commandBuffer);
 
@@ -525,7 +525,7 @@ namespace aqua
         vkFreeCommandBuffers(_device, _commandPool, 1, &commandBuffer);
     }
 
-    void AquaDevice::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size)
+    void ADevice::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size)
     {
         VkCommandBuffer commandBuffer = beginSingleTimeCommands();
 
@@ -538,7 +538,7 @@ namespace aqua
         endSingleTimeCommands(commandBuffer);
     }
 
-    void AquaDevice::copyBufferToImage(
+    void ADevice::copyBufferToImage(
             VkBuffer buffer, VkImage image, uint32_t width, uint32_t height, uint32_t layerCount)
     {
         VkCommandBuffer commandBuffer = beginSingleTimeCommands();
@@ -566,7 +566,7 @@ namespace aqua
         endSingleTimeCommands(commandBuffer);
     }
 
-    void AquaDevice::createImageWithInfo(
+    void ADevice::createImageWithInfo(
             const VkImageCreateInfo& imageInfo,
             VkMemoryPropertyFlags properties,
             VkImage& image,
@@ -596,8 +596,8 @@ namespace aqua
         }
     }
 
-    void AquaDevice::transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout,
-                                           VkImageLayout newLayout)
+    void ADevice::transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout,
+                                        VkImageLayout newLayout)
     {
         auto commandBuffer = beginSingleTimeCommands();
 

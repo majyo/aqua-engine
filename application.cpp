@@ -33,7 +33,7 @@ namespace aqua
 
     void Application::run()
     {
-        ATexture texture(_aquaDevice, "../Textures/wood_albedo.png");
+        ATexture texture(_aquaDevice, "../models/box/box_albedo.png");
 
         std::vector<std::unique_ptr<Buffer>> uboBuffers(SwapChain::MAX_FRAMES_IN_FLIGHT);
         for (auto& uboBuffer: uboBuffers)
@@ -130,10 +130,10 @@ namespace aqua
 
     void Application::loadGameObject()
     {
-        std::shared_ptr<Model> model = Model::createModelFromFile(_aquaDevice, "../models/cube.obj");
+        std::shared_ptr<Model> model = Model::createModelFromFile(_aquaDevice, "../models/box/box.obj");
         auto gameObject = GameObject::createGameObject();
         gameObject.model = model;
-        gameObject.transform.scale = {1.0f, 1.0f, 1.0f};
+//        gameObject.transform.scale = {1.0f, 1.0f, 1.0f};
 //        gameObject.transform.scale = {7.0f, 7.0f, 7.0f};
 //        gameObject.transform.rotation = {0.0f, 0.0f, glm::pi<float>()};
         _gameObjects.push_back(std::move(gameObject));

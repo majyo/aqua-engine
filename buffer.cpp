@@ -29,7 +29,7 @@ namespace aqua
     }
 
     Buffer::Buffer(
-            AquaDevice& device,
+            ADevice& device,
             VkDeviceSize instanceSize,
             uint32_t instanceCount,
             VkBufferUsageFlags usageFlags,

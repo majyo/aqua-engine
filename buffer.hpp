@@ -2,7 +2,7 @@
 
 #include "Defines.hpp"
 
-#include "device.hpp"
+#include "ADevice.hpp"
 
 namespace aqua
 {
@@ -11,7 +11,7 @@ namespace aqua
     {
     public:
         Buffer(
-                AquaDevice& device,
+                ADevice& device,
                 VkDeviceSize instanceSize,
                 uint32_t instanceCount,
                 VkBufferUsageFlags usageFlags,
@@ -71,7 +71,7 @@ namespace aqua
     private:
         static VkDeviceSize getAlignment(VkDeviceSize instanceSize, VkDeviceSize minOffsetAlignment);
 
-        AquaDevice& device;
+        ADevice& device;
         void* mapped = nullptr;
         VkBuffer buffer = VK_NULL_HANDLE;
         VkDeviceMemory memory = VK_NULL_HANDLE;
