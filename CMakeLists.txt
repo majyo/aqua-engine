@@ -20,7 +20,7 @@ else()
     find_package(glm REQUIRED)
 endif()
 
-add_executable(VulkanDemo main.cpp aqua_window.hpp aqua_window.cpp application.hpp application.cpp pipeline.cpp pipeline.hpp ADevice.hpp ADevice.cpp swap_chain.hpp swap_chain.cpp model.cpp model.hpp game_object.hpp camera.hpp camera.cpp renderer.cpp renderer.hpp simple_render_system.hpp simple_render_system.cpp keyboard_movement.hpp keyboard_movement.cpp utils.hpp game_object.cpp buffer.cpp buffer.hpp frame_info.hpp descriptor.hpp descriptor.cpp Textures/ATexture.cpp Textures/ATexture.hpp AVulkanHelper.cpp AVulkanHelper.hpp)
+add_executable(VulkanDemo main.cpp aqua_window.hpp aqua_window.cpp application.hpp application.cpp pipeline.cpp pipeline.hpp ADevice.hpp ADevice.cpp swap_chain.hpp swap_chain.cpp model.cpp model.hpp game_object.hpp camera.hpp camera.cpp renderer.cpp renderer.hpp simple_render_system.hpp simple_render_system.cpp keyboard_movement.hpp keyboard_movement.cpp utils.hpp game_object.cpp buffer.cpp buffer.hpp frame_info.hpp descriptor.hpp descriptor.cpp Textures/ATexture.cpp Textures/ATexture.hpp AVulkanHelper.cpp AVulkanHelper.hpp ARenderPass.cpp ARenderPass.hpp)
 
 #target_precompile_headers(VulkanDemo PRIVATE Defines.hpp)
 

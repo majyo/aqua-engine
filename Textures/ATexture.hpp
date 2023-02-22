@@ -19,22 +19,21 @@ namespace aqua
             explicit Builder(ADevice& aDevice);
 
             std::unique_ptr<ATexture> Build();
-            std::unique_ptr<ATexture> BuildFromFile(const char* filename);
-            std::unique_ptr<ATexture> BuildTexture2D();
-            std::unique_ptr<ATexture> BuildDepthStencil();
+            Builder& LoadFromFile(const char* filename);
+            Builder& CreateTexture2D();
+            Builder& CreateDepthStencil();
+            Builder& CreateTexture2DSampler();
 
         public:
-            uint32_t width{};
-            uint32_t height{};
-            VkImageType imageType{};
-            VkFormat format{};
-            VkImageUsageFlags usages{};
+            bool createSampler{false};
+            void* imageFileData = nullptr;
+            VkImageCreateInfo imageCreateInfo{};
+            VkImageViewCreateInfo imageViewCreateInfo{};
+            VkSamplerCreateInfo samplerCreateInfo{};
 
         private:
-            void* LoadImageData(const char* filename);
-            void CreateImage(VkImage& image, VkDeviceMemory& memory);
-            void CreateImageView(VkImage image, VkImageView& imageView);
-            void CreateSampler(VkSampler& imageSampler);
+            void InitCreateInfo();
+            void CopyFileData(VkImage& image);
 
         private:
             ADevice& _aDevice;

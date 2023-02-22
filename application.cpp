@@ -34,7 +34,11 @@ namespace aqua
     void Application::run()
     {
         ATexture::Builder textureBuilder(_aquaDevice);
-        std::unique_ptr<ATexture> texture = textureBuilder.BuildFromFile("../Resources/models/box/box_albedo.png");
+        std::unique_ptr<ATexture> texture = textureBuilder
+                .LoadFromFile("../Resources/models/box/box_albedo.png")
+                .CreateTexture2D()
+                .CreateTexture2DSampler()
+                .Build();
 
         std::vector<std::unique_ptr<Buffer>> uboBuffers(SwapChain::MAX_FRAMES_IN_FLIGHT);
         for (auto& uboBuffer: uboBuffers)
